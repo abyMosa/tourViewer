@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 export let users = async (req: Request, res: Response) => {
     let users = await User.find();
     res.status(200).send(users.map(toUserNoPassword));
+
 };
 
 export let user = async (req: Request, res: Response) => {

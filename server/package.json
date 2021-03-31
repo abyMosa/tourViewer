@@ -6,7 +6,11 @@
   "scripts": {
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/index.js",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\""
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
+    "clean": "rimraf dist/",
+    "copy-files": "copyfiles -u 1 src/views/**/*.html dist/src",
+    "copy-assets": "copyfiles -u 1 public/**/* dist/public",
+    "build": "yarn clean && tsc && yarn copy-files && yarn copy-assets"
   },
   "author": "",
   "license": "ISC",
@@ -27,7 +31,9 @@
     "@types/cors": "^2.8.10",
     "@types/hapi__joi": "^17.1.6",
     "@types/jsonwebtoken": "^8.5.0",
+    "copyfiles": "^2.4.1",
     "cors": "^2.8.5",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "rimraf": "^3.0.2"
   }
 }
