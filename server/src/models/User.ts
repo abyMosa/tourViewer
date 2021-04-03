@@ -1,10 +1,16 @@
 import * as mongoose from "mongoose";
 
+export enum UserRole {
+    Admin = "Admin",
+    Regular = "Regular",
+}
+
 export interface IUser extends mongoose.Document {
     title: string;
     firstName: string;
     lastName: string;
     email: string;
+    role: UserRole;
     password: string;
     registered: Date;
 }
@@ -15,6 +21,7 @@ export interface IUserNoPassword {
     firstName: string;
     lastName: string;
     email: string;
+    role: UserRole;
     registered: Date;
 }
 
@@ -42,6 +49,11 @@ export const UserSchema = new mongoose.Schema({
         required: true,
         min: 6,
         max: 255
+    },
+    role: {
+        type: String,
+        required: true,
+        default: UserRole.Regular
     },
     password: {
         type: String,
