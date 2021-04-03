@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import { AxiosResponse, AxiosError, AxiosInstance } from "axios";
 import jwt from 'jsonwebtoken';
 import { axiosErr } from "../../axios";
-
+import { difference } from "../../utils/date";
 
 export const authInit = () => {
     return {
@@ -73,5 +73,11 @@ export const logout = () => {
 
 export const getUser = (token: string) => {
     return jwt.decode(token) as User;
+}
+
+export const isTokenExpired = (tokenSignedAt: number) => {
+    const hourDif = difference.inHours(new Date(tokenSignedAt * 1000), new Date());
+    // this can change to anything
+    return hourDif > 24;
 }
 

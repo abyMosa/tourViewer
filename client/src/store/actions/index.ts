@@ -1,4 +1,4 @@
 
-export { login, authSuccess, logout, getUser } from './auth';
+export { login, authSuccess, logout, getUser, isTokenExpired } from './auth';
 export { fetchUserTours, fetchTour, deleteTour, addTour } from './tours';
 

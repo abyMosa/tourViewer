@@ -1,5 +1,9 @@
 
 
+export interface DecodedToken extends User {
+    iat: number;
+}
+
 export interface User {
     _id: string;
     title: string;
@@ -9,6 +13,7 @@ export interface User {
     role: UserRole;
     registered: Date;
 }
+
 
 export enum UserRole {
     Admin = "Admin",
