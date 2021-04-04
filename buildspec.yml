@@ -8,6 +8,7 @@ phases:
       - echo Executing install phase
     finally:
       - echo Executing install phase COMPLETE
+      - echo '//npm.pkg.github.com/:_authToken=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' > ~/.npmrc
   pre_build:
     commands:
       - cd client
