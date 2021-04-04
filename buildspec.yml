@@ -23,6 +23,7 @@ phases:
       - mkdir temp/build
       - cp -R ./client/build/* temp/build
       - cp -R ./server temp/build/server
+      - cp -R ./viewer temp/build/viewer
       - cp -R ./appspec.yml temp/appspec.yml
       - cp -R ./awsCICD temp/awsCICD
 

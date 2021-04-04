@@ -10,7 +10,7 @@ const app = express();
 const port = 5000;
 dotenv.config();
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({ origin: "http://localhost:3000" }));
 
