@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Container, Col, Row, Loader, HeadLine, TextInput, Btn } from 'inspirepress-styleguide';
+import { Container, Col, Row, Loader, HeadLine, TextInput, Btn } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import { addTour } from "../store/actions";

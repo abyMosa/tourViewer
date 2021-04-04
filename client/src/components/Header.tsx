@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Toolbar, Logo } from "inspirepress-styleguide";
+import { Toolbar, Logo } from "@abymosa/ipsg";
 import { useSelector, useDispatch } from "react-redux";
 import { ApplicationState } from '../store/reducers';
 import { NavLink } from 'react-router-dom';

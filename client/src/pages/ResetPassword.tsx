@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { Form, Col, Row, HTMLContent, Loader, Snackbar } from 'inspirepress-styleguide';
+import { Form, Col, Row, HTMLContent, Loader, Snackbar } from '@abymosa/ipsg';
 import { useSelector } from 'react-redux';
 import { Redirect, useLocation } from 'react-router-dom';
 import { ApplicationState } from '../store/reducers';

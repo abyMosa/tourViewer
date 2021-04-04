@@ -2,8 +2,8 @@ import "react-app-polyfill/ie9";
 import "react-app-polyfill/stable";
 
 import React, { useEffect } from 'react';
-import "inspirepress-styleguide/dist/index.css";
-// import { SiteLoader } from "inspirepress-styleguide";
+import "@abymosa/ipsg/dist/index.css";
+// import { SiteLoader } from "@abymosa/ipsg";
 import { useSelector, useDispatch } from "react-redux";
 import { Switch, Route, Redirect } from "react-router-dom";
 import MainLayout from "./hoc/MainLayout";
@@ -40,7 +40,7 @@ function App() {
       return () => clearInterval(tokenExpiryInterval);
     }
 
-  }, []);
+  }, [dispatch, token]);
 
   return (
     <div className="App">

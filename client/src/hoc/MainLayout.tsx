@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Row, Col } from "inspirepress-styleguide";
+import { Row, Col } from "@abymosa/ipsg";
 // import Footer from "../Components/Footer";
 // import MobileMenu from '../Components/MobileMenu';
 

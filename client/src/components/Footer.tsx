@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toolbar } from "inspirepress-styleguide";
+import { Toolbar } from "@abymosa/ipsg";
 
 const Footer = () => {
     return (

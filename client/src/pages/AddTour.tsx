@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Container, Col, Row, Loader, HeadLine, TextInput, Btn, Snackbar } from 'inspirepress-styleguide';
-import { useDispatch, useSelector } from 'react-redux';
-import { Redirect, Link } from 'react-router-dom';
-import { addTour } from "../store/actions";
+import { Container, Col, Row, Loader, HeadLine, TextInput, Btn, Snackbar } from '@abymosa/ipsg';
+import { useSelector } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { ApplicationState } from '../store/reducers';
 import { api, axiosErr } from "../axios";
 import axios from 'axios';
-import S3FileUpload from 'react-s3';
-import { User, EventType } from "../types/types";
+import { EventType } from "../types/types";
 import ProgressBar from '../components/ProgressBar';
-
-
 
 
 enum FormField {
@@ -29,7 +25,7 @@ interface AddTourForm {
 
 
 const AddTour = () => {
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const [showSnackbar, setShowSnackbar] = useState(false);
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal } from 'inspirepress-styleguide';
+import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import { fetchUserTours, getTourViewerLink } from "../store/actions";
@@ -7,11 +7,11 @@ import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faDownload, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
 
 const User = () => {
 
-    const [showModal, setShowModal] = useState(false);
+    // const [showModal, setShowModal] = useState(false);
     const [showSnackbar, setShowSnackbar] = useState(false);
     const { isAuthenticated, user } = useSelector((state: ApplicationState) => state.auth);
     const { userTours, loadingUserTours } = useSelector((state: ApplicationState) => state.tours);
@@ -23,7 +23,7 @@ const User = () => {
         if (user) {
             dispatch(fetchUserTours(api, user._id));
         }
-    }, [user]);
+    }, [dispatch, user]);
 
     const filteredToures = userTours.filter(t => t.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1);
     const filterButNoResult = filteredToures.length === 0 && filterText !== '';
@@ -34,7 +34,6 @@ const User = () => {
             <Container className="px-3 user-container">
                 <Snackbar
                     show={showSnackbar}
-                    // title="Registered Successfully"
                     message="Copied to Clipboard"
                     onComplete={() => setShowSnackbar(false)}
                     timeOut={3000}
@@ -72,7 +71,7 @@ const User = () => {
                                         : toursToDisplay.map(t => {
                                             return (
                                                 <div className="tours-content__tour" key={t._id}>
-                                                    <div><img src={t.image} /></div>
+                                                    <div><img alt={t.name} src={t.image} /></div>
                                                     <div>
                                                         <h3 className="capitalise-fl mb-0">{t.name}</h3>
                                                         <p className="mb-3 mt-1 tag">Added {format_DD_MM_YYYY(new Date(t.createdAt).getTime() / 1000)}</p>
@@ -96,6 +95,7 @@ const User = () => {
                                                         <a
                                                             href={getTourViewerLink(t.url)}
                                                             target="_blank"
+                                                            rel="noreferrer"
                                                             className="nodecoration"
                                                         >
                                                             <Btn sm className="" text="open" />
