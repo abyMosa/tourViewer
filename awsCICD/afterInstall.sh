@@ -4,4 +4,5 @@ sudo chown -R ubuntu /var/www/rowilab
 cd /var/www/rowilab/server && npm install
 sudo systemctl restart nginx
 pm2 delete all
+pm2 stop all
 pm2 start /var/www/rowilab/server/dist/index.js --name "server"
