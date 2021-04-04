@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Container, Col, Row, Loader, HeadLine, TextInput, Btn } from 'inspirepress-styleguide';
+import { Container, Col, Row, Loader, HeadLine, TextInput, Btn, Snackbar } from 'inspirepress-styleguide';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import { addTour } from "../store/actions";
@@ -30,6 +30,8 @@ interface AddTourForm {
 
 const AddTour = () => {
     const dispatch = useDispatch();
+
+    const [showSnackbar, setShowSnackbar] = useState(false);
 
     const { isAuthenticated, user } = useSelector((state: ApplicationState) => state.auth);
     const { isAddingTour } = useSelector((state: ApplicationState) => state.tours);
@@ -76,7 +78,6 @@ const AddTour = () => {
     const onSubmit = (e: any) => {
         e.preventDefault();
         uploadTour();
-        setEvents(event => [...event, EventType.UploadStarted]);
     }
 
     const getFileParts = (name: string, file: File, prefix: string) => {
@@ -91,7 +92,8 @@ const AddTour = () => {
 
         if (addTourForm.tourFile && addTourForm.imageFile) {
 
-            setEvents(event => [...event, EventType.PreparingFiles]);
+            setEvents(event => [...event, EventType.UploadStarted, EventType.PreparingFiles]);
+
             let imageFile = getFileParts(addTourForm.name, addTourForm.imageFile, 'images');
             let tourFile = getFileParts(addTourForm.name, addTourForm.tourFile, 'tours');
 
@@ -145,7 +147,8 @@ const AddTour = () => {
                                             console.log('s3sign ++ upload to aws ++ store in db ', response);
                                             setIsLoading(false);
                                             setEvents(event => [...event, EventType.UploadSucceeded]);
-
+                                            // setAddTourForm(defaultForm)
+                                            setShowSnackbar(true);
                                         })
                                         .catch(er => {
                                             console.log('failed to store in db', er);
@@ -182,28 +185,53 @@ const AddTour = () => {
 
     }
 
+    const isCurrentEvent = (event: EventType) => {
+        let index = events.findIndex(e => e === event);
+        return index === events.length - 1 && event !== EventType.UploadSucceeded;
+
+    }
+
+    const formatLog = (event: (EventType | null), text: string): JSX.Element => {
+        return (
+            <div className="df f-jc-start f-aa-center">
+                <div style={{ width: "30px" }}>
+                    {event === null ? null :
+                        isCurrentEvent(event)
+                            ? <div className="spinner"></div>
+                            : "✔"
+                    }
+                </div>
+                <div className="ml-2"><p>{text}</p></div>
+            </div>
+        )
+    }
+
     const getEventContent = (event: EventType): JSX.Element => {
 
         switch (event) {
             case EventType.PreparingFiles:
-                return (<p>Preparing files ....</p>)
+                return formatLog(event, 'Preparing files');
+
 
             case EventType.UploadStarted:
-                return <p>Upload Started ....</p>
+                return formatLog(event, 'Upload started');
 
             case EventType.S3signSuccessful:
-                return <p>Getting Aws S3 Sign request..</p>
+                return formatLog(event, 'Getting AWS S3 sign request');
 
             case EventType.UploadingImage:
                 return (
                     <div>
-                        <p>Uploading Image...</p>
+                        {formatLog(event, `Uploading image (${progress.image} - ${addTourForm.imageFile?.size})`)}
                         {addTourForm.imageFile &&
-                            <ProgressBar
-                                show={progress.image !== 0}
-                                position={progress.image}
-                                total={addTourForm.imageFile.size}
-                            />
+                            <div className="df">
+                                <div style={{ width: "38px" }}></div>
+                                <ProgressBar
+                                    show={progress.image !== 0}
+                                    position={progress.image}
+                                    total={addTourForm.imageFile.size}
+                                />
+                            </div>
                         }
                     </div>
                 )
@@ -211,32 +239,29 @@ const AddTour = () => {
             case EventType.UploadingTour:
                 return (
                     <div>
-                        <p>Uploading Tour...</p>
-                        <p>Large file, pleasse be patient.</p>
+                        {formatLog(event, 'Uploading Tour')}
+                        {formatLog(null, `Large file, pleasse be patient (${progress.tour} - ${addTourForm.tourFile?.size})`)}
                         {addTourForm.tourFile &&
-                            <ProgressBar
-                                show={progress.tour !== 0}
-                                position={progress.tour}
-                                total={addTourForm.tourFile.size}
-                            />
+                            <div className="df">
+                                <div style={{ width: "38px" }}></div>
+                                <ProgressBar
+                                    show={progress.tour !== 0}
+                                    position={progress.tour}
+                                    total={addTourForm.tourFile.size}
+                                />
+                            </div>
                         }
                     </div>
                 )
 
             case EventType.UpdatingRecords:
-                return <p>Nearly there, updating our records, wont take long.</p>
-
+                return formatLog(event, 'Nearly there, updating our records, wont take long')
 
             case EventType.UploadSucceeded:
-                return <p>Upload Succeeded.</p>
+                return formatLog(event, 'Upload Succeeded')
 
             case EventType.UploadFailed:
-                return (
-                    <div>
-                        <p>Upload Failed :( </p>
-                        <p>Maybe try again. </p>
-                    </div>
-                )
+                return formatLog(event, 'Upload Failed :(')
 
 
             default:
@@ -248,9 +273,16 @@ const AddTour = () => {
     return (
         !isAuthenticated ? <Redirect to='/login' /> :
             <Container className="px-3 addTour-container">
+                <Snackbar
+                    show={showSnackbar}
+                    message="File uploaded Succefully"
+                    onComplete={() => setShowSnackbar(false)}
+                    timeOut={3000}
+                />
+
                 <Row className="" >
 
-                    <Col md6 className="pr-3">
+                    <Col md7 className="pr-3">
                         <HeadLine title="Add Tour" className="mb-4 mt-1" />
                         <Loader show={isAddingTour || loading} />
 
@@ -266,31 +298,35 @@ const AddTour = () => {
                                 onChange={(e: any) => onChange(FormField.name, e)}
                             />
 
-                            <h2 className="mt-5">Upload preview image</h2>
+                            <h4 className="mt-5 capitalise">Upload preview image</h4>
 
                             <input
                                 type="file"
+                                disabled={isAddingTour || loading}
                                 onChange={(e: any) => onChange(FormField.image, e)}
                             />
 
-                            <h2 className="mt-5">Upload Tour File</h2>
+                            <h4 className="mt-5 capitalise">Upload Tour File</h4>
 
                             <input
                                 type="file"
+                                disabled={isAddingTour || loading}
                                 onChange={(e: any) => onChange(FormField.tour, e)}
                             />
 
                             <br />
-                            <Btn className="mt-6" text="Add Tour" disabled={!isFormValid} />
+                            <Btn block className="mt-5" text="Add Tour" disabled={!isFormValid || isAddingTour || loading} />
 
                         </form>
 
                     </Col>
-                    <Col md6 className="uploadResult">
-                        {
-                            events.length === 0 ? <p>Upload hasnt started yet</p> :
-                                events.map(event => getEventContent(event))
-                        }
+                    <Col md5 className="uploadResult">
+                        <div className="mt-5">
+                            {
+                                events.length === 0 ? null :
+                                    events.map(event => getEventContent(event))
+                            }
+                        </div>
                     </Col>
                 </Row>
             </Container>

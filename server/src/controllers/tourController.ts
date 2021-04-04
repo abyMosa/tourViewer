@@ -48,7 +48,7 @@ export let deleteTour = async (req: Request, res: Response) => {
 };
 
 export let getAllTours = async (req: Request, res: Response) => {
-    let tours = await Tour.find().sort({ date: -1 });
+    let tours = await Tour.find().sort({ createdAt: -1 });
     res.status(200).send(tours);
 };
 
@@ -64,7 +64,7 @@ export let getUserTours = async (req: Request, res: Response) => {
         })
     }
 
-    let tours = await Tour.find({ user: req.params.id }).sort({ date: -1 });
+    let tours = await Tour.find({ user: req.params.id }).sort({ createdAt: -1 });
     res.status(200).send(tours);
 };
 

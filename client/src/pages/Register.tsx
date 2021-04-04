@@ -85,7 +85,7 @@ const Register = () => {
                         btnSize="lg"
                     />
 
-                    <p className="ta-center">have an account <Link to='/login'>Click here</Link> to login</p>
+                    <p className="ta-center mt-4">Already a customer? <Link to='/login'>Click here</Link> to login</p>
 
                 </Col>
             </Row>

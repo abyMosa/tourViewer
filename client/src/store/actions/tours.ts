@@ -140,4 +140,21 @@ export const addTour = async (axios: AxiosInstance, form: AddTourForm) => {
     }
 }
 
-// list all user tours
+// ====================================
+// helpers 
+
+
+export const getTourViewerLink = (urlString: string) => {
+    let url = new URL(urlString);
+    let urlHrefAr = url.href.split("");
+
+    if (urlHrefAr[urlHrefAr.length - 1] === '/')
+        urlHrefAr.splice(urlHrefAr.length - 1, 1);
+
+    let UrlHrefNoNameAr = urlHrefAr.join('').split('/');
+    let tourName = UrlHrefNoNameAr.splice(UrlHrefNoNameAr.length - 1, 1);
+    let urlHref = UrlHrefNoNameAr.join('/');
+    let currentEnv = window.location.hostname === 'localhost' ? "http://localhost:5000" : '';
+    const viewerPath = `${currentEnv}/viewer`;
+    return `${viewerPath}?tour=${tourName}&content-path=${urlHref}`;
+}

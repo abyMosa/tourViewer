@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { Row, Col } from "inspirepress-styleguide";
 // import Footer from "../Components/Footer";
 // import MobileMenu from '../Components/MobileMenu';
@@ -15,7 +16,7 @@ const MainLayout: React.FunctionComponent = (props) => {
                 </Row>
             </div>
 
-            {/* <Footer /> */}
+            <Footer />
         </div>
     )
 };

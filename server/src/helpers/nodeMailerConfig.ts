@@ -9,6 +9,7 @@ export interface MailArgs {
     html?: string;
     cb: (error: (Error | null), success: any) => void
 }
+// dre7am@hotmail.com
 
 export const transport = createTransport({
     host: 'smtp.ionos.co.uk',
@@ -41,7 +42,7 @@ export const sendResetLinkEmail = (user: IUser, link: string) => {
         `,
         cb: (err, info) => {
             if (err) {
-                // console.log(err);
+                console.log(err);
             } else {
                 // console.log(info);
             }
@@ -56,7 +57,7 @@ export const sendPasswordResetSuccessfulEmail = (user: IUser) => {
         html: `<p>Hi ${user.firstName},</p> <p>Your password has been reset successfully.</p> `,
         cb: (err, info) => {
             if (err) {
-                // console.log(err);
+                console.log(err);
             } else {
                 // console.log(info);
             }

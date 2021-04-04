@@ -54,6 +54,10 @@
     ]
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-brands-svg-icons": "^5.14.0",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@types/axios": "^0.14.0",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/react-router-dom": "^5.1.7",

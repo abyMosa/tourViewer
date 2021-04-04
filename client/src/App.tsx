@@ -51,7 +51,7 @@ function App() {
 
       {/* {!loading && */}
       <Switch>
-        {/* <Route path='/' component={container(MainLayout, Login)} /> */}
+        <Route exact path='/' component={container(MainLayout, User)} />
         <Route exact path='/register' component={container(MainLayout, Register)} />
         <Route exact path='/login' component={container(MainLayout, Login)} />
         <Route exact path='/user' component={container(MainLayout, User)} />
