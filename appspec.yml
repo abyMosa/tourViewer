@@ -1,0 +1,24 @@
+version: 0.0
+os: linux
+files:
+  - source: /build
+    destination: /var/www/rowilab/
+permissions:
+  - object: /var/www/rowilab/
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
+    type:
+    - file
+hooks:
+#   BeforeInstall:
+#   - location: awsCICD/installapache.sh
+#     timeout: 300
+#     runas: root
+#   - location: awsCICD/startapache.sh
+#     timeout: 300
+#     runas: root
+  AfterInstall:
+  - location: awsCICD/afterInstall.sh
+    runas: ubuntu
