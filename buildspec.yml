@@ -25,7 +25,7 @@ phases:
       - mkdir temp/build/rowilabViewer
       - cp -R ./client/build/* temp/build/rowilab
       - cp -R ./server temp/build/rowilab/server
-      - cp -R ./viewer temp/build/rowilabViewer
+      - cp -R ./viewer/* temp/build/rowilabViewer
       - cp -R ./appspec.yml temp/appspec.yml
       - cp -R ./awsCICD temp/awsCICD
 
