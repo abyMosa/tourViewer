@@ -24,7 +24,7 @@ const ResetPassword: FunctionComponent = () => {
     ];
 
     let onSubmit = () => {
-
+        setLoading(true);
         api.post('/auth/resetpassword', { email, origin: `${window.location.origin}/verify-password-reset-token` })
             .then(response => {
                 if (response.status === 200) {

@@ -151,9 +151,10 @@ export const resetpassword = async (req: Request, res: Response) => {
     const link = `${req.body.origin}/?token=${resetToken}&id=${user._id}`;
 
     // sendResetLink passing the email and the id
-    sendResetLinkEmail(user, link);
+    const result = await sendResetLinkEmail(user, link);
+    console.log(result);
 
-    res.status(200).json();
+    res.status(200).send(result);
 }
 
 export const verifyResetToken = async (req: Request, res: Response) => {

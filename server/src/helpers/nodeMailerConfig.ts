@@ -20,19 +20,25 @@ export const transport = createTransport({
     }
 });
 
-export const sendEmail = (mailArgs: MailArgs): void => {
+export const sendEmail = async (mailArgs: MailArgs): Promise<any> => {
     const message: Mail.Options = {
         from: 'info@inspirepress.co.uk',
         ...mailArgs
     }
 
-    transport.sendMail(message, (err, info) => mailArgs.cb(err, info));
+    // transport.sendMail(message, (err, info) => new Promise (resolve => resolve(mailArgs.cb(err, info))));
+    try {
+        const info = await transport.sendMail(message);
+        return info;
+    } catch (error) {
+        return error;
+    }
 }
 
 
-export const sendResetLinkEmail = (user: IUser, link: string) => {
+export const sendResetLinkEmail = async (user: IUser, link: string): Promise<any> => {
 
-    sendEmail({
+    return sendEmail({
         to: user.email,
         subject: "Reset Password Request",
         html: `<p>Hi ${user.firstName},</p>
@@ -43,8 +49,10 @@ export const sendResetLinkEmail = (user: IUser, link: string) => {
         cb: (err, info) => {
             if (err) {
                 console.log(err);
+                return new Promise(resolve => resolve(err));
             } else {
                 // console.log(info);
+                return new Promise(resolve => resolve(info));
             }
         }
     });
