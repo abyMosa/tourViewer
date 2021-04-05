@@ -12,7 +12,8 @@ phases:
       - echo Executing install phase
     finally:
       - echo Executing install phase COMPLETE
-      - echo '//npm.pkg.github.com/:_authToken=$NPMRC_TOKEN' > ~/.npmrc
+      - echo $NPMRC_TOKEN
+      - echo //npm.pkg.github.com/:_authToken=$NPMRC_TOKEN > ~/.npmrc
   pre_build:
     commands:
       - cd client
