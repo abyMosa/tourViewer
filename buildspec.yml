@@ -1,38 +1,41 @@
 version: 0.2
 
-phases: 
-  install:
-    runtime-versions:
-      nodejs: 10
-    commands:
-      - echo Executing install phase
-    finally:
-      - echo Executing install phase COMPLETE
-      - echo '//npm.pkg.github.com/:_authToken=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' > ~/.npmrc
-  pre_build:
-    commands:
-      - cd client
-      - npm install
-  build:
-    commands:
-      - npm run build
-  post_build:
-    commands:
-      - cd ..
-      - mkdir temp
-      - mkdir temp/build
-      - mkdir temp/build/rowilab
-      - mkdir temp/build/rowilabViewer
-      - cp -R ./client/build/* temp/build/rowilab
-      - cp -R ./server temp/build/rowilab/server
-      - cp -R ./viewer/* temp/build/rowilabViewer
-      - cp -R ./appspec.yml temp/appspec.yml
-      - cp -R ./awsCICD temp/awsCICD
+  env:
+    parameter-store:
+      NPMRC_TOKEN: /codeBuild/npmrc_token
+  phases: 
+    install:
+      runtime-versions:
+        nodejs: 10
+      commands:
+        - echo Executing install phase
+      finally:
+        - echo Executing install phase COMPLETE
+        - echo '//npm.pkg.github.com/:_authToken=$NPMRC_TOKEN' > ~/.npmrc
+    pre_build:
+      commands:
+        - cd client
+        - npm install
+    build:
+      commands:
+        - npm run build
+    post_build:
+      commands:
+        - cd ..
+        - mkdir temp
+        - mkdir temp/build
+        - mkdir temp/build/rowilab
+        - mkdir temp/build/rowilabViewer
+        - cp -R ./client/build/* temp/build/rowilab
+        - cp -R ./server temp/build/rowilab/server
+        - cp -R ./viewer/* temp/build/rowilabViewer
+        - cp -R ./appspec.yml temp/appspec.yml
+        - cp -R ./awsCICD temp/awsCICD
 
-artifacts:
-  files:
-    - "**/*"
-  base-directory: "temp"
+  artifacts:
+    files:
+      - "**/*"
+    base-directory: "temp"
 
 #   discard-paths: yes
 
