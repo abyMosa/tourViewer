@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: /build
-    destination: /var/www/rowilab/
+    destination: /var/www/
 permissions:
-  - object: /var/www/rowilab/
+  - object: /var/www/
     pattern: "**"
     owner: ubuntu
     group: ubuntu
