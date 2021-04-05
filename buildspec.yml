@@ -1,7 +1,9 @@
 version: 0.2
 env:
-  parameter-store:
-    NPMRC_TOKEN: /codeBuild/npmrc_token
+  # parameter-store:
+  #   NPMRC_TOKEN: /codeBuild/npmrc_token
+  variables:
+    NPMRC_TOKEN: npmrc_token
 phases: 
   install:
     runtime-versions:
