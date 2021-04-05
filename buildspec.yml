@@ -2,8 +2,8 @@ version: 0.2
 env:
   # parameter-store:
   #   NPMRC_TOKEN: /codeBuild/npmrc_token
-  variables:
-    NPMRC_TOKEN: npmrc_token
+  # variables:
+  #   NPMRC_TOKEN: npmrc_token
 phases: 
   install:
     runtime-versions:
@@ -13,7 +13,6 @@ phases:
     finally:
       - echo Executing install phase COMPLETE
       - echo $NPMRC_TOKEN
-      - echo $npmrc_token
       - echo //npm.pkg.github.com/:_authToken=$NPMRC_TOKEN > ~/.npmrc
   pre_build:
     commands:
