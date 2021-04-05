@@ -155,6 +155,6 @@ export const getTourViewerLink = (urlString: string) => {
     let tourName = UrlHrefNoNameAr.splice(UrlHrefNoNameAr.length - 1, 1);
     let urlHref = UrlHrefNoNameAr.join('/');
     let currentEnv = window.location.hostname === 'localhost' ? "http://localhost:5000" : '';
-    const viewerPath = `${currentEnv}/viewer`;
+    const viewerPath = `${currentEnv}/viewer/index.html`;
     return `${viewerPath}?tour=${tourName}&content-path=${urlHref}`;
 }
