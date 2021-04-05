@@ -7,9 +7,8 @@ export interface MailArgs {
     subject: string;
     text?: string;
     html?: string;
-    cb: (error: (Error | null), success: any) => void
+    // cb: (error: (Error | null), success: any) => void
 }
-// dre7am@hotmail.com
 
 export const transport = createTransport({
     host: 'smtp.ionos.co.uk',
@@ -29,9 +28,9 @@ export const sendEmail = async (mailArgs: MailArgs): Promise<any> => {
     // transport.sendMail(message, (err, info) => new Promise (resolve => resolve(mailArgs.cb(err, info))));
     try {
         const info = await transport.sendMail(message);
-        return info;
+        return new Promise(resolve => resolve(info));
     } catch (error) {
-        return error;
+        return new Promise((resolve, reject) => reject(error));
     }
 }
 
@@ -45,30 +44,32 @@ export const sendResetLinkEmail = async (user: IUser, link: string): Promise<any
             <p>You have requested to reset your password</p>
             <p>Please, click the link below to reset your password</p>
             <p><a href='${link}'>Reset Passwork</a></p>
-        `,
-        cb: (err, info) => {
-            if (err) {
-                console.log(err);
-                return new Promise(resolve => resolve(err));
-            } else {
-                // console.log(info);
-                return new Promise(resolve => resolve(info));
-            }
-        }
+        `
+        // cb: (err, info) => {
+        //     if (err) {
+        //         console.log(err);
+        //         return new Promise(resolve => resolve(err));
+        //     } else {
+        //         // console.log(info);
+        //         return new Promise(resolve => resolve(info));
+        //     }
+        // }
     });
 }
 
-export const sendPasswordResetSuccessfulEmail = (user: IUser) => {
-    sendEmail({
+export const sendPasswordResetSuccessfulEmail = (user: IUser): Promise<any> => {
+    return sendEmail({
         to: user.email,
         subject: "Reset Password Successfull",
         html: `<p>Hi ${user.firstName},</p> <p>Your password has been reset successfully.</p> `,
-        cb: (err, info) => {
-            if (err) {
-                console.log(err);
-            } else {
-                // console.log(info);
-            }
-        }
+        // cb: (err, info) => {
+        //     if (err) {
+        //         console.log(err);
+        //         return new Promise(resolve => resolve(err));
+        //     } else {
+        //         return new Promise(resolve => resolve(info));
+        //         // console.log(info);
+        //     }
+        // }
     });
 }

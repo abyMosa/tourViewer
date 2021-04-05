@@ -49,7 +49,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendPasswordResetSuccessfulEmail = exports.sendResetLinkEmail = exports.sendEmail = exports.transport = void 0;
 var nodemailer_1 = require("nodemailer");
-// dre7am@hotmail.com
 exports.transport = nodemailer_1.createTransport({
     host: 'smtp.ionos.co.uk',
     port: 587,
@@ -59,7 +58,7 @@ exports.transport = nodemailer_1.createTransport({
     }
 });
 var sendEmail = function (mailArgs) { return __awaiter(void 0, void 0, void 0, function () {
-    var message, info, error_1;
+    var message, info_1, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -69,11 +68,11 @@ var sendEmail = function (mailArgs) { return __awaiter(void 0, void 0, void 0, f
                 _a.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, exports.transport.sendMail(message)];
             case 2:
-                info = _a.sent();
-                return [2 /*return*/, info];
+                info_1 = _a.sent();
+                return [2 /*return*/, new Promise(function (resolve) { return resolve(info_1); })];
             case 3:
                 error_1 = _a.sent();
-                return [2 /*return*/, error_1];
+                return [2 /*return*/, new Promise(function (resolve, reject) { return reject(error_1); })];
             case 4: return [2 /*return*/];
         }
     });
@@ -84,35 +83,35 @@ var sendResetLinkEmail = function (user, link) { return __awaiter(void 0, void 0
         return [2 /*return*/, exports.sendEmail({
                 to: user.email,
                 subject: "Reset Password Request",
-                html: "<p>Hi " + user.firstName + ",</p>\n            <p>You have requested to reset your password</p>\n            <p>Please, click the link below to reset your password</p>\n            <p><a href='" + link + "'>Reset Passwork</a></p>\n        ",
-                cb: function (err, info) {
-                    if (err) {
-                        console.log(err);
-                        return new Promise(function (resolve) { return resolve(err); });
-                    }
-                    else {
-                        // console.log(info);
-                        return new Promise(function (resolve) { return resolve(info); });
-                    }
-                }
+                html: "<p>Hi " + user.firstName + ",</p>\n            <p>You have requested to reset your password</p>\n            <p>Please, click the link below to reset your password</p>\n            <p><a href='" + link + "'>Reset Passwork</a></p>\n        "
+                // cb: (err, info) => {
+                //     if (err) {
+                //         console.log(err);
+                //         return new Promise(resolve => resolve(err));
+                //     } else {
+                //         // console.log(info);
+                //         return new Promise(resolve => resolve(info));
+                //     }
+                // }
             })];
     });
 }); };
 exports.sendResetLinkEmail = sendResetLinkEmail;
 var sendPasswordResetSuccessfulEmail = function (user) {
-    exports.sendEmail({
+    return exports.sendEmail({
         to: user.email,
         subject: "Reset Password Successfull",
         html: "<p>Hi " + user.firstName + ",</p> <p>Your password has been reset successfully.</p> ",
-        cb: function (err, info) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                // console.log(info);
-            }
-        }
+        // cb: (err, info) => {
+        //     if (err) {
+        //         console.log(err);
+        //         return new Promise(resolve => resolve(err));
+        //     } else {
+        //         return new Promise(resolve => resolve(info));
+        //         // console.log(info);
+        //     }
+        // }
     });
 };
 exports.sendPasswordResetSuccessfulEmail = sendPasswordResetSuccessfulEmail;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibm9kZU1haWxlckNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIuL3NyYy8iLCJzb3VyY2VzIjpbInNyYy9oZWxwZXJzL25vZGVNYWlsZXJDb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSx5Q0FBNkM7QUFXN0MscUJBQXFCO0FBRVIsUUFBQSxTQUFTLEdBQUcsNEJBQWUsQ0FBQztJQUNyQyxJQUFJLEVBQUUsa0JBQWtCO0lBQ3hCLElBQUksRUFBRSxHQUFHO0lBQ1QsSUFBSSxFQUFFO1FBQ0YsSUFBSSxFQUFFLHlCQUF5QjtRQUMvQixJQUFJLEVBQUUsYUFBYTtLQUN0QjtDQUNKLENBQUMsQ0FBQztBQUVJLElBQU0sU0FBUyxHQUFHLFVBQU8sUUFBa0I7Ozs7O2dCQUN4QyxPQUFPLGNBQ1QsSUFBSSxFQUFFLHlCQUF5QixJQUM1QixRQUFRLENBQ2QsQ0FBQTs7OztnQkFJZ0IscUJBQU0saUJBQVMsQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDLEVBQUE7O2dCQUF4QyxJQUFJLEdBQUcsU0FBaUM7Z0JBQzlDLHNCQUFPLElBQUksRUFBQzs7O2dCQUVaLHNCQUFPLE9BQUssRUFBQzs7OztLQUVwQixDQUFBO0FBYlksUUFBQSxTQUFTLGFBYXJCO0FBR00sSUFBTSxrQkFBa0IsR0FBRyxVQUFPLElBQVcsRUFBRSxJQUFZOztRQUU5RCxzQkFBTyxpQkFBUyxDQUFDO2dCQUNiLEVBQUUsRUFBRSxJQUFJLENBQUMsS0FBSztnQkFDZCxPQUFPLEVBQUUsd0JBQXdCO2dCQUNqQyxJQUFJLEVBQUUsV0FBUyxJQUFJLENBQUMsU0FBUyw2S0FHWCxJQUFJLHVDQUNyQjtnQkFDRCxFQUFFLEVBQUUsVUFBQyxHQUFHLEVBQUUsSUFBSTtvQkFDVixJQUFJLEdBQUcsRUFBRTt3QkFDTCxPQUFPLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxDQUFDO3dCQUNqQixPQUFPLElBQUksT0FBTyxDQUFDLFVBQUEsT0FBTyxJQUFJLE9BQUEsT0FBTyxDQUFDLEdBQUcsQ0FBQyxFQUFaLENBQVksQ0FBQyxDQUFDO3FCQUMvQzt5QkFBTTt3QkFDSCxxQkFBcUI7d0JBQ3JCLE9BQU8sSUFBSSxPQUFPLENBQUMsVUFBQSxPQUFPLElBQUksT0FBQSxPQUFPLENBQUMsSUFBSSxDQUFDLEVBQWIsQ0FBYSxDQUFDLENBQUM7cUJBQ2hEO2dCQUNMLENBQUM7YUFDSixDQUFDLEVBQUM7O0tBQ04sQ0FBQTtBQXBCWSxRQUFBLGtCQUFrQixzQkFvQjlCO0FBRU0sSUFBTSxnQ0FBZ0MsR0FBRyxVQUFDLElBQVc7SUFDeEQsaUJBQVMsQ0FBQztRQUNOLEVBQUUsRUFBRSxJQUFJLENBQUMsS0FBSztRQUNkLE9BQU8sRUFBRSw0QkFBNEI7UUFDckMsSUFBSSxFQUFFLFdBQVMsSUFBSSxDQUFDLFNBQVMsNkRBQTBEO1FBQ3ZGLEVBQUUsRUFBRSxVQUFDLEdBQUcsRUFBRSxJQUFJO1lBQ1YsSUFBSSxHQUFHLEVBQUU7Z0JBQ0wsT0FBTyxDQUFDLEdBQUcsQ0FBQyxHQUFHLENBQUMsQ0FBQzthQUNwQjtpQkFBTTtnQkFDSCxxQkFBcUI7YUFDeEI7UUFDTCxDQUFDO0tBQ0osQ0FBQyxDQUFDO0FBQ1AsQ0FBQyxDQUFBO0FBYlksUUFBQSxnQ0FBZ0Msb0NBYTVDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibm9kZU1haWxlckNvbmZpZy5qcyIsInNvdXJjZVJvb3QiOiIuL3NyYy8iLCJzb3VyY2VzIjpbInNyYy9oZWxwZXJzL25vZGVNYWlsZXJDb25maWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSx5Q0FBNkM7QUFZaEMsUUFBQSxTQUFTLEdBQUcsNEJBQWUsQ0FBQztJQUNyQyxJQUFJLEVBQUUsa0JBQWtCO0lBQ3hCLElBQUksRUFBRSxHQUFHO0lBQ1QsSUFBSSxFQUFFO1FBQ0YsSUFBSSxFQUFFLHlCQUF5QjtRQUMvQixJQUFJLEVBQUUsYUFBYTtLQUN0QjtDQUNKLENBQUMsQ0FBQztBQUVJLElBQU0sU0FBUyxHQUFHLFVBQU8sUUFBa0I7Ozs7O2dCQUN4QyxPQUFPLGNBQ1QsSUFBSSxFQUFFLHlCQUF5QixJQUM1QixRQUFRLENBQ2QsQ0FBQTs7OztnQkFJZ0IscUJBQU0saUJBQVMsQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDLEVBQUE7O2dCQUF4QyxTQUFPLFNBQWlDO2dCQUM5QyxzQkFBTyxJQUFJLE9BQU8sQ0FBQyxVQUFBLE9BQU8sSUFBSSxPQUFBLE9BQU8sQ0FBQyxNQUFJLENBQUMsRUFBYixDQUFhLENBQUMsRUFBQzs7O2dCQUU3QyxzQkFBTyxJQUFJLE9BQU8sQ0FBQyxVQUFDLE9BQU8sRUFBRSxNQUFNLElBQUssT0FBQSxNQUFNLENBQUMsT0FBSyxDQUFDLEVBQWIsQ0FBYSxDQUFDLEVBQUM7Ozs7S0FFOUQsQ0FBQTtBQWJZLFFBQUEsU0FBUyxhQWFyQjtBQUdNLElBQU0sa0JBQWtCLEdBQUcsVUFBTyxJQUFXLEVBQUUsSUFBWTs7UUFFOUQsc0JBQU8saUJBQVMsQ0FBQztnQkFDYixFQUFFLEVBQUUsSUFBSSxDQUFDLEtBQUs7Z0JBQ2QsT0FBTyxFQUFFLHdCQUF3QjtnQkFDakMsSUFBSSxFQUFFLFdBQVMsSUFBSSxDQUFDLFNBQVMsNktBR1gsSUFBSSx1Q0FDckI7Z0JBQ0QsdUJBQXVCO2dCQUN2QixpQkFBaUI7Z0JBQ2pCLDRCQUE0QjtnQkFDNUIsdURBQXVEO2dCQUN2RCxlQUFlO2dCQUNmLGdDQUFnQztnQkFDaEMsd0RBQXdEO2dCQUN4RCxRQUFRO2dCQUNSLElBQUk7YUFDUCxDQUFDLEVBQUM7O0tBQ04sQ0FBQTtBQXBCWSxRQUFBLGtCQUFrQixzQkFvQjlCO0FBRU0sSUFBTSxnQ0FBZ0MsR0FBRyxVQUFDLElBQVc7SUFDeEQsT0FBTyxpQkFBUyxDQUFDO1FBQ2IsRUFBRSxFQUFFLElBQUksQ0FBQyxLQUFLO1FBQ2QsT0FBTyxFQUFFLDRCQUE0QjtRQUNyQyxJQUFJLEVBQUUsV0FBUyxJQUFJLENBQUMsU0FBUyw2REFBMEQ7UUFDdkYsdUJBQXVCO1FBQ3ZCLGlCQUFpQjtRQUNqQiw0QkFBNEI7UUFDNUIsdURBQXVEO1FBQ3ZELGVBQWU7UUFDZix3REFBd0Q7UUFDeEQsZ0NBQWdDO1FBQ2hDLFFBQVE7UUFDUixJQUFJO0tBQ1AsQ0FBQyxDQUFDO0FBQ1AsQ0FBQyxDQUFBO0FBZlksUUFBQSxnQ0FBZ0Msb0NBZTVDIn0=
