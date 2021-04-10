@@ -201,32 +201,3 @@ body{
     transform:rotate(360deg);
   }
 }
-
-.tobi-wrapper{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100%;
-}
-
-.tobi-wrapper svg{
-    animation-name:tobiWhistle;
-    animation-duration:6s;
-    animation-iteration-count:infinite;
-  }
-
-@keyframes tobiWhistle{
-  0%{ transform:rotate(0deg); }
-  8%{ transform:rotate(15deg); }
-  16%{ transform:rotate(10deg); }
-  24%{ transform:rotate(15deg); }
-  
-  35%{ transform:rotate(-15deg); }
-  43%{ transform:rotate(-10deg); }
-  51%{ transform:rotate(-15deg); }
-  
-  62%{ transform:rotate(15deg); }
-  70%{ transform:rotate(10deg); }
-  78%{ transform:rotate(15deg); }
-  86%{ transform:rotate(0deg); }
-}

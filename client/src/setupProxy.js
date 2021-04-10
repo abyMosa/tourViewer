@@ -9,4 +9,12 @@ module.exports = function (app) {
             pathRewrite: { '^/api': '' }
         })
     );
+    app.use(
+        '/viewer',
+        createProxyMiddleware({
+            target: process.env.REACT_APP_DEV_VIEWER_URL,
+            changeOrigin: true,
+            pathRewrite: { '^/viewer': '' }
+        })
+    );
 };
