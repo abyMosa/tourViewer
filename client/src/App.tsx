@@ -59,6 +59,7 @@ function App() {
         <Route exact path='/user/addtour' component={container(MainLayout, AddTour)} />
         <Route exact path='/resetpassword' component={container(MainLayout, ResetPassword)} />
         <Route exact path='/verify-password-reset-token' component={container(MainLayout, VerifyPasswordResetToken)} />
+
         <Route exact path='/notfound' component={container(MainLayout, NotFound)} />
         <Redirect from='*' to='/notfound' />
       </Switch>

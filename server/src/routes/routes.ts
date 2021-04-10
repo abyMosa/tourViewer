@@ -33,10 +33,11 @@ routes.delete('/tour/:id', verifyToken, tourController.deleteTour);
 routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
 
-// // viewer
-// routes.get('/viewer', (req, res) => {
-//     res.sendFile(path.join(__dirname, '../', 'views', 'viewer.html'));
-// });
+// viewer
+routes.get('/viewer', (req, res) => {
+    res.sendFile(path.join(__dirname, '../', 'views', 'viewer.html'));
+    // res.sendFile('viewer/index.html');
+});
 
 
 export default routes;
