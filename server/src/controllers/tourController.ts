@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import Tour, { ITour } from "../models/Tour";
 import User from "../models/User";
 import mongoose from 'mongoose';
-import multer from 'multer';
 // import AWS from "aws-sdk";
 import { AWSS3 } from "../../awssdk";
-// import { S3 } from "aws-sdk";
+import decompress from 'decompress';
+import path from "path";
+import fs from "fs";
 
 
 
@@ -36,8 +37,26 @@ export let deleteTour = async (req: Request, res: Response) => {
     }
 
     try {
-        const deleted = await tour.delete();
-        res.status(200).send(deleted);
+
+        fs.rmdir('./dist/public/' + tour.url, { recursive: true }, async (err) => {
+            if (err) {
+                console.log("Not Folder", err);
+                return res.status(400).send({
+                    error: true,
+                    message: 'unexpected error',
+                    errorObj: err
+                })
+            }
+
+            console.log("Folder Deleted!");
+            if (tour) {
+                const deleted = await tour.delete();
+                return res.status(200).send(deleted);
+            } else {
+                return res.status(500).send({ error: true, message: 'unexpected error' })
+            }
+        });
+
 
     } catch (error) {
         return res.status(400).send({
@@ -46,6 +65,7 @@ export let deleteTour = async (req: Request, res: Response) => {
         })
     }
 };
+
 
 export let getAllTours = async (req: Request, res: Response) => {
     let tours = await Tour.find().sort({ createdAt: -1 });
@@ -85,10 +105,26 @@ export let addTour = async (req: Request, res: any) => {
         });
     }
 
+    // if req.body.filePath is undefined fail TODO::
+
+    const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
+
+    try {
+        await decompress(req.body.filePath, unzipPath);
+        fs.unlink(req.body.filePath, (err) => {
+            if (err) console.log('err:: deleting the compressed file', err);
+
+            console.log('zip file deleted');
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
+    }
+
     const tour: ITour = new Tour({
         name: req.body.name,
-        image: req.body.image,
-        url: req.body.url,
+        url: 'tours/' + urlPath,
         user: req.body.user,
     });
 
@@ -102,6 +138,21 @@ export let addTour = async (req: Request, res: any) => {
     }
 };
 
+const getStoragePaths = (p: string, id: string) => {
+
+    let folderName = path.basename(p, '.zip');
+    let timeStamp = Date.now();
+    const urlPath = [id, timeStamp, folderName].join('/');
+    const unzipPath = process.env.unzipPath! + '/' + urlPath;
+    return { unzipPath, urlPath }
+
+    // if (!fs.existsSync(unzipPath)) {
+    //     return { unzipPath, urlPath }
+    // } else {
+    //     const newP = 
+    //     return getStoragePath(newP, id);
+    // }
+}
 
 // export const s3sign = (req: Request, res: Response) => {
 

@@ -8,20 +8,19 @@ import { api, axiosErr } from "../axios";
 import axios from 'axios';
 import { EventType } from "../types/types";
 import ProgressBar from '../components/ProgressBar';
+import path from "path";
+import { spawn } from 'node:child_process';
 
 
 enum FormField {
     name,
     tour,
-    image
 }
 
 interface AddTourForm {
     name: string;
     tourFile: (File | null);
-    imageFile: (File | null);
 }
-
 
 
 const AddTour = () => {
@@ -32,17 +31,17 @@ const AddTour = () => {
     const { isAuthenticated, user } = useSelector((state: ApplicationState) => state.auth);
     const { isAddingTour } = useSelector((state: ApplicationState) => state.tours);
 
-    const defaultForm: AddTourForm = { name: '', tourFile: null, imageFile: null }
+    const defaultForm: AddTourForm = { name: '', tourFile: null }
     const [addTourForm, setAddTourForm] = useState(defaultForm);
 
     const [isFormValid, setIsFormValid] = useState(false);
     const [loading, setIsLoading] = useState(false);
 
-    const [progress, setProgress] = useState({ image: 0, tour: 0 });
+    const [progress, setProgress] = useState([0, 0]);
     const [events, setEvents] = useState<EventType[]>([]);
 
     const validateForm = (form: AddTourForm): void => {
-        let isValid = (form.name !== '' && form.tourFile && form.imageFile) ? true : false;
+        let isValid = (form.name !== '' && form.tourFile) ? true : false;
         setIsFormValid(isValid);
     }
 
@@ -59,12 +58,6 @@ const AddTour = () => {
                 console.log(e.target.files[0]);
                 break;
 
-            case FormField.image:
-                setAddTourForm({ ...addTourForm, imageFile: e.target.files[0] })
-                validateForm({ ...addTourForm, imageFile: e.target.files[0] })
-                console.log(e.target.files[0]);
-                break;
-
             default:
                 break;
         }
@@ -76,103 +69,48 @@ const AddTour = () => {
         uploadTour();
     }
 
-    const getFileParts = (name: string, file: File, prefix: string) => {
-        let fileParts = file.name.split('.');
-        let fileName = name.replaceAll(' ', '').toLowerCase();
-        let fileType = fileParts[fileParts.length - 1];
-        return { fileName: `${prefix}/${fileName}`, fileType }
-    }
+    // const getFileParts = (name: string, file: File, prefix: string) => {
+    //     let fileParts = file.name.split('.');
+    //     let fileName = name.replaceAll(' ', '').toLowerCase();
+    //     let fileType = fileParts[fileParts.length - 1];
+    //     return { fileName: `${prefix}/${fileName}`, fileType }
+    // }
 
     const uploadTour = () => {
+        setEvents([]);
         setIsLoading(true);
 
-        if (addTourForm.tourFile && addTourForm.imageFile) {
+        if (addTourForm.tourFile && user) {
 
             setEvents(event => [...event, EventType.UploadStarted, EventType.PreparingFiles]);
 
-            let imageFile = getFileParts(addTourForm.name, addTourForm.imageFile, 'images');
-            let tourFile = getFileParts(addTourForm.name, addTourForm.tourFile, 'tours');
+            setEvents(event => [...event, EventType.UploadingTour]);
+            var options = {
+                headers: { 'Content-Type': "multipart/form-data" },
+                onUploadProgress: (progressEvent: any) => {
+                    setProgress([progressEvent.loaded, progressEvent.total]);
 
-            api.post('/tour/s3sign', { image: imageFile, tour: tourFile })
-                .then(res => {
-                    setEvents(event => [...event, EventType.S3signSuccessful]);
-                    console.log('res 1', res);
+                    if (progressEvent.loaded >= progressEvent.total) {
+                        setEvents(event => [...event, EventType.UpdatingRecords]);
+                    }
+                }
+            };
 
-                    let imageSignedRequest = res.data.aws.image.signedRequest;
-                    let imageUrl = res.data.aws.image.url;
+            var bodyFormData = new FormData();
+            bodyFormData.append('tour', addTourForm.tourFile);
+            bodyFormData.append('name', addTourForm.name);
+            bodyFormData.append('user', user._id);
 
-                    let tourSignedRequest = res.data.aws.tour.signedRequest;
-                    let tourUrl = res.data.aws.tour.url;
-
-
-                    console.log("Recieved image signed request " + imageSignedRequest);
-                    console.log("Recieved tour signed request " + tourSignedRequest);
-
-
-
-                    setEvents(event => [...event, EventType.UploadingImage]);
-                    // upload image
-                    var imageOptions = {
-                        headers: { 'Content-Type': imageFile.fileType },
-                        onUploadProgress: (progressEvent: any) => setProgress(p => ({ ...p, image: progressEvent.loaded }))
-                    };
-
-                    axios.put(imageSignedRequest, addTourForm.imageFile, imageOptions)
-                        .then(imageUploadRes => {
-
-                            console.log("Response from s3 uploading image", imageUploadRes)
-
-
-
-                            setEvents(event => [...event, EventType.UploadingTour]);
-                            var options = {
-                                headers: { 'Content-Type': tourFile.fileType },
-                                onUploadProgress: (progressEvent: any) => setProgress(p => ({ ...p, tour: progressEvent.loaded }))
-                            };
-
-                            axios.put(tourSignedRequest, addTourForm.tourFile, options)
-                                .then(result => {
-                                    console.log("Response from s3", result)
-
-                                    setEvents(event => [...event, EventType.UpdatingRecords]);
-
-                                    let tour = { name: addTourForm.name, image: imageUrl, url: tourUrl, user: user?._id };
-
-                                    api.post('/tour', tour)
-                                        .then(response => {
-                                            console.log('s3sign ++ upload to aws ++ store in db ', response);
-                                            setIsLoading(false);
-                                            setEvents(event => [...event, EventType.UploadSucceeded]);
-                                            // setAddTourForm(defaultForm)
-                                            setShowSnackbar(true);
-                                        })
-                                        .catch(er => {
-                                            console.log('failed to store in db', er);
-                                            setIsLoading(false);
-                                            setEvents(event => [...event, EventType.UploadFailed]);
-                                        });
-
-                                })
-                                .catch(error => {
-                                    // alert("ERROR " + JSON.stringify(error));
-                                    console.log('ERROR', error);
-                                    console.log('message', axiosErr(error));
-                                    setIsLoading(false);
-                                    setEvents(event => [...event, EventType.UploadFailed]);
-                                })
-
-                        })
-                        .catch(imageUploadErr => {
-                            console.log('imageUploadErr', imageUploadErr);
-                            console.log('message', axiosErr(imageUploadErr));
-                            setIsLoading(false);
-                            setEvents(event => [...event, EventType.UploadFailed]);
-                        })
-
+            api.post('/tour', bodyFormData, options)
+                .then(result => {
+                    console.log("upload complete", result);
+                    setIsLoading(false);
+                    setEvents(event => [...event, EventType.UploadSucceeded]);
+                    setShowSnackbar(true);
 
                 })
                 .catch(err => {
-                    console.log('err', err);
+                    console.log(err);
                     setIsLoading(false);
                     setEvents(event => [...event, EventType.UploadFailed]);
                 })
@@ -183,7 +121,7 @@ const AddTour = () => {
 
     const isCurrentEvent = (event: EventType) => {
         let index = events.findIndex(e => e === event);
-        return index === events.length - 1 && event !== EventType.UploadSucceeded;
+        return index === events.length - 1 && event !== EventType.UploadSucceeded && event !== EventType.UploadFailed;
 
     }
 
@@ -212,38 +150,18 @@ const AddTour = () => {
             case EventType.UploadStarted:
                 return formatLog(event, 'Upload started');
 
-            case EventType.S3signSuccessful:
-                return formatLog(event, 'Getting AWS S3 sign request');
-
-            case EventType.UploadingImage:
-                return (
-                    <div>
-                        {formatLog(event, `Uploading image (${progress.image} - ${addTourForm.imageFile?.size})`)}
-                        {addTourForm.imageFile &&
-                            <div className="df">
-                                <div style={{ width: "38px" }}></div>
-                                <ProgressBar
-                                    show={progress.image !== 0}
-                                    position={progress.image}
-                                    total={addTourForm.imageFile.size}
-                                />
-                            </div>
-                        }
-                    </div>
-                )
-
             case EventType.UploadingTour:
                 return (
                     <div>
                         {formatLog(event, 'Uploading Tour')}
-                        {formatLog(null, `Large file, pleasse be patient (${progress.tour} - ${addTourForm.tourFile?.size})`)}
+                        {formatLog(null, `Large file, pleasse be patient (${progress[0]} - ${progress[1]})`)}
                         {addTourForm.tourFile &&
                             <div className="df">
                                 <div style={{ width: "38px" }}></div>
                                 <ProgressBar
-                                    show={progress.tour !== 0}
-                                    position={progress.tour}
-                                    total={addTourForm.tourFile.size}
+                                    show={progress[0] !== 0}
+                                    position={progress[0]}
+                                    total={progress[1]}
                                 />
                             </div>
                         }
@@ -251,7 +169,7 @@ const AddTour = () => {
                 )
 
             case EventType.UpdatingRecords:
-                return formatLog(event, 'Nearly there, updating our records, wont take long')
+                return formatLog(event, 'Nearly there, decompressing file and updating our records.')
 
             case EventType.UploadSucceeded:
                 return formatLog(event, 'Upload Succeeded')
@@ -294,20 +212,13 @@ const AddTour = () => {
                                 onChange={(e: any) => onChange(FormField.name, e)}
                             />
 
-                            <h4 className="mt-5 capitalise">Upload preview image</h4>
-
-                            <input
-                                type="file"
-                                disabled={isAddingTour || loading}
-                                onChange={(e: any) => onChange(FormField.image, e)}
-                            />
-
                             <h4 className="mt-5 capitalise">Upload Tour File</h4>
 
                             <input
                                 type="file"
                                 disabled={isAddingTour || loading}
                                 onChange={(e: any) => onChange(FormField.tour, e)}
+                                accept=".zip"
                             />
 
                             <br />
@@ -320,7 +231,7 @@ const AddTour = () => {
                         <div className="mt-5">
                             {
                                 events.length === 0 ? null :
-                                    events.map(event => getEventContent(event))
+                                    events.map((event, i) => <span key={i}>{getEventContent(event)}</span>)
                             }
                         </div>
                     </Col>

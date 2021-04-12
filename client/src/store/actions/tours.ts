@@ -107,19 +107,20 @@ export const fetchTour = (axios: AxiosInstance, id: string) => {
 
 // delete a tour
 export const deleteTour = (axios: AxiosInstance, id: string, cb: (status: any) => void) => {
-
-    axios.delete(`/tour/${id}`)
-        .then((res: AxiosResponse) => {
-            if (res.status === 200) {
-                cb({ status: res.status });
-            } else if (res.data.error) {
-                cb({ status: res.status, message: res.data.message });
-            }
-        })
-        .catch((err: AxiosError) => {
-            console.log(err.message);
-            cb({ status: 500, message: err.message });
-        })
+    return (dispatch: Dispatch) => {
+        axios.delete(`/tour/${id}`)
+            .then((res: AxiosResponse) => {
+                if (res.status === 200) {
+                    cb({ status: res.status });
+                } else if (res.data.error) {
+                    cb({ status: res.status, message: res.data.message });
+                }
+            })
+            .catch((err: AxiosError) => {
+                console.log(err.message);
+                cb({ status: 500, message: err.message });
+            })
+    }
 }
 
 
@@ -144,8 +145,9 @@ export const addTour = async (axios: AxiosInstance, form: AddTourForm) => {
 // helpers 
 
 
-export const getTourViewerLink = (urlString: string) => {
-    let url = new URL(urlString);
+export const getTourViewerLink = (tourPath: string) => {
+    let tourFullPath = `${window.location.origin}/api/${tourPath}`;
+    let url = new URL(tourFullPath);
     let urlHrefAr = url.href.split("");
 
     if (urlHrefAr[urlHrefAr.length - 1] === '/')
@@ -154,7 +156,14 @@ export const getTourViewerLink = (urlString: string) => {
     let UrlHrefNoNameAr = urlHrefAr.join('').split('/');
     let tourName = UrlHrefNoNameAr.splice(UrlHrefNoNameAr.length - 1, 1);
     let urlHref = UrlHrefNoNameAr.join('/');
-    let currentEnv = window.location.hostname === 'localhost' ? "http://localhost:5000" : '';
-    const viewerPath = `${currentEnv}/viewer/index.html`;
-    return `${viewerPath}?tour=${tourName}&content-path=${urlHref}`;
+    const viewerPath = `/viewer/index.html`;
+    return `${viewerPath}?tour=${tourName}&content-path=${urlHref}/`;
+}
+
+export const getTourUrl = (tourPath: string) => {
+    return `${window.location.origin}/api/${tourPath}`;
+}
+
+export const getTourImageUrl = (tourPath: string) => {
+    return `${getTourUrl(tourPath)}/preview.jpg`;
 }
