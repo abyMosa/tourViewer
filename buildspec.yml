@@ -16,10 +16,10 @@ phases:
   build:
     commands:
       - npm run build
-      - cd ..
-      - cd server
-      - npm install
-      - tsc
+      # - cd ..
+      # - cd server
+      # - npm install
+      # - tsc
   post_build:
     commands:
       - cd ..
