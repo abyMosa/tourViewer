@@ -10,7 +10,7 @@ phases:
       - echo //npm.pkg.github.com/:_authToken=$NPMRC_TOKEN > ~/.npmrc
   pre_build:
     commands:
-      - npm install -g typescript
+      # - npm install -g typescript
       - cd client
       - npm install
   build:
