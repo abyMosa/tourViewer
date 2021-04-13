@@ -6,7 +6,7 @@ sudo chown -R ubuntu:ubuntu /var/www/rowilab
 sudo chown -R ubuntu:ubuntu /var/www/rowilabViewer
 cd /var/www/rowilab/server && yarn
 cd /var/www/rowilab/server && ls -al
-cd /var/www/rowilab/server && tsc
+# cd /var/www/rowilab/server && tsc
 sudo systemctl restart nginx
 pm2 delete all
 pm2 stop all
