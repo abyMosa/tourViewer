@@ -266,3 +266,27 @@ body {
   min-width: 400px!important;
   padding: 20px!important;
 }
+
+@media screen and (max-width: 719px){
+  .ab-toolbar ul {
+      display: flex!important;
+  }
+  .tours-content__tour{
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 30px!important;
+
+    > div:nth-child(2){
+      padding-left: 0px!important;
+    }
+
+    > div > .ab-btn__wrapper{
+      margin-right: 15px;
+    }
+    
+    img{
+      max-width: 100%!important;
+    }
+    
+  }
+}
