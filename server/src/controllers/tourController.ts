@@ -108,6 +108,13 @@ export let addTour = async (req: Request, res: any) => {
             });
         }
 
+        if (!req.body.filePath) {
+            return res.status(400).send({
+                error: true,
+                message: `Could not find a req.body.filePath ${req.body.filePath}`
+            });
+        }
+
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
             res.status(400).send(err);
