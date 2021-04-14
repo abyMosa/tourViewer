@@ -110,7 +110,7 @@ const AddTour = () => {
 
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log(axiosErr(err));
                     setIsLoading(false);
                     setEvents(event => [...event, EventType.UploadFailed]);
                 })

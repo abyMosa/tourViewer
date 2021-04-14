@@ -14,7 +14,6 @@ app.use('/tours', express.static(path.join(__dirname, 'public', 'tours')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({ origin: "http://localhost:3000" }));
-// app.use(cors({ origin: "http://localhost:5500" }));
 
 mongoose.connect(
     process.env.DB_CONNECT!,
