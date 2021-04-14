@@ -220,7 +220,7 @@ const getStoragePaths = (p: string, id: string) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = './dist/public/tours/' + urlPath;
+    const unzipPath = './public/tours/' + urlPath;
     return { unzipPath, urlPath }
 
     // if (!fs.existsSync(unzipPath)) {
