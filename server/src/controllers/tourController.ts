@@ -91,6 +91,30 @@ export let getUserTours = async (req: Request, res: Response) => {
 
 
 export let addTour = async (req: Request, res: any) => {
+
+    // if (!req.body.user)
+    //     return res.status(400).send({ error: true, message: "user is required!" });
+
+    // if (!mongoose.Types.ObjectId.isValid(req.body.user))
+    //     return res.status(400).send({ error: true, message: "Invalid user id!" });
+
+
+    // let user = await User.findById(req.body.user);
+    // if (!user) {
+    //     return res.status(400).send({
+    //         error: true,
+    //         message: `Could not find a user with id ${req.body.device}`
+    //     });
+    // }
+
+
+    // if (!req.body.filePath) {
+    //     return res.status(400).send({
+    //         error: true,
+    //         message: `Could not find a req.body.filePath ${req.body.filePath}`
+    //     });
+    // }
+
     tourUploader(req, res, async (err: any) => {
 
         if (!req.body.user)
@@ -196,7 +220,7 @@ const getStoragePaths = (p: string, id: string) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = process.env.unzipPath! + '/' + urlPath;
+    const unzipPath = './dist/public/tours/' + urlPath;
     return { unzipPath, urlPath }
 
     // if (!fs.existsSync(unzipPath)) {

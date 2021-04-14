@@ -3,10 +3,11 @@ import path from 'path';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.uploadPath!);
+        // cb(null, process.env.uploadPath!);
+        cb(null, './dist/zips');
     },
     filename: (req, file, cb) => {
-        const filePath = path.join(process.env.uploadPath!, file.originalname);
+        const filePath = path.join('./dist/zips', file.originalname);
         req.body.filePath = filePath;
         cb(null, file.originalname);
     },
