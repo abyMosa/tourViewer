@@ -1,22 +1,21 @@
-import { Request, Response } from "express";
-import User, { IUser, IUserNoPassword, UserRole } from "../models/User";
-import Token from "../models/Token";
-import * as bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { registerValidation, loginValidation, toUserNoPassword, validatePassword, validateUpdatedUser } from '../helpers/authValidation';
-import mongoose from 'mongoose';
-import { uuid } from "uuidv4";
-import { sendResetLinkEmail, sendPasswordResetSuccessfulEmail } from '../helpers/nodeMailerConfig';
-import { generateToken } from "../helpers/verifyToken";
+const User = require("../models/User");
+const Token = require("../models/Token");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { registerValidation, loginValidation, toUserNoPassword, validatePassword, validateUpdatedUser } = require('../helpers/authValidation');
+const mongoose = require('mongoose');
+const { uuid } = require("uuidv4");
+const { sendResetLinkEmail, sendPasswordResetSuccessfulEmail } = require('../helpers/nodeMailerConfig');
+const { generateToken } = require("../helpers/verifyToken");
 
 
-export let users = async (req: Request, res: Response) => {
+const users = async (req, res) => {
     let users = await User.find();
     res.status(200).send(users.map(toUserNoPassword));
 
 };
 
-export let user = async (req: Request, res: Response) => {
+const user = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid user id!" });
 
@@ -24,11 +23,11 @@ export let user = async (req: Request, res: Response) => {
     if (!user) return res.status(400).send({ error: true, message: "User not found" });
 
     // let userNoPass: IUserNoPassword = user as IUserNoPassword;
-    let userNoPass: IUserNoPassword = toUserNoPassword(user);
+    let userNoPass = toUserNoPassword(user);
     res.status(200).send(userNoPass);
 };
 
-export let deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid user id!" });
 
@@ -47,11 +46,11 @@ export let deleteUser = async (req: Request, res: Response) => {
     }
 };
 
-export let updateUserRole = async (req: Request, res: Response) => {
+const updateUserRole = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid user id!" });
 
-    if (!req.body.role || ![UserRole.Admin, UserRole.Regular].includes(req.body.role))
+    if (!req.body.role || !['Admin', 'Regular'].includes(req.body.role))
         return res.status(400).send({ error: true, message: "Invalid user role!" });
 
     let user = await User.findById(req.params.id);
@@ -65,11 +64,11 @@ export let updateUserRole = async (req: Request, res: Response) => {
     // let updatedUser = await User.findById(req.body.id);
     if (!updatedUser) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
 
-    let userNoPass: IUserNoPassword = toUserNoPassword(updatedUser);
+    let userNoPass = toUserNoPassword(updatedUser);
     res.status(200).send(userNoPass);
 };
 
-export let register = async (req: Request, res: Response) => {
+const register = async (req, res) => {
     // validate request
     const { error } = registerValidation(req.body);
     if (error) return res.status(400).send({ error: true, message: error.details[0].message });
@@ -83,15 +82,15 @@ export let register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     const users = await User.find();
-    const admins = await User.find({ role: UserRole.Admin });
+    const admins = await User.find({ role: 'Admin' });
 
     // create user
-    const user: IUser = new User({
+    const user = new User({
         title: req.body.title,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        role: users.length === 0 || admins.length === 0 ? UserRole.Admin : UserRole.Regular,
+        role: users.length === 0 || admins.length === 0 ? 'Admin' : 'Regular',
         password: hashedPassword
     });
     try {
@@ -108,7 +107,7 @@ export let register = async (req: Request, res: Response) => {
 
 };
 
-export const login = async (req: Request, res: Response) => {
+const login = async (req, res) => {
     // validate request
     const { error } = loginValidation(req.body);
     if (error) return res.status(400).send({ error: true, message: error.details[0].message });
@@ -125,7 +124,7 @@ export const login = async (req: Request, res: Response) => {
 }
 
 
-export const resetpassword = async (req: Request, res: Response) => {
+const resetpassword = async (req, res) => {
 
     if (!req.body.email)
         return res.status(400).send({ error: true, message: "Email is required" });
@@ -163,7 +162,7 @@ export const resetpassword = async (req: Request, res: Response) => {
     }
 }
 
-export const verifyResetToken = async (req: Request, res: Response) => {
+const verifyResetToken = async (req, res) => {
     if (!req.body.token)
         return res.status(400).send({ error: true, message: "Token is required" });
 
@@ -208,7 +207,7 @@ export const verifyResetToken = async (req: Request, res: Response) => {
 }
 
 // to update pass while user is logged in. token must be provided
-export const updateUserPassword = async (req: Request, res: Response) => {
+const updateUserPassword = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid user id!" });
@@ -242,7 +241,7 @@ export const updateUserPassword = async (req: Request, res: Response) => {
 
 
 // to update pass while user is logged in. token must be provided
-export const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid user id!" });
@@ -277,3 +276,15 @@ export const updateUser = async (req: Request, res: Response) => {
 
     res.status(200).send(results);
 }
+
+module.exports.login = login;
+module.exports.register = register;
+module.exports.user = user;
+module.exports.users = users;
+
+module.exports.deleteUser = deleteUser
+module.exports.updateUserRole = updateUserRole
+module.exports.resetpassword = resetpassword
+module.exports.verifyResetToken = verifyResetToken
+module.exports.updateUserPassword = updateUserPassword
+module.exports.updateUser = updateUser

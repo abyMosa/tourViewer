@@ -1,8 +1,8 @@
-import { Request, Response, Router } from 'express';
-import * as userController from "../controllers/userController";
-import * as tourController from "../controllers/tourController";
-import { verifyToken } from '../helpers/verifyToken';
-import { tourUploader } from "../routes/uploadMiddleware";
+const { Router } = require('express');
+const userController = require("../controllers/userController");
+const tourController = require("../controllers/tourController");
+const { verifyToken } = require('../helpers/verifyToken');
+const { tourUploader } = require('./uploadMiddleware');
 
 const routes = Router();
 
@@ -35,4 +35,4 @@ routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
 
 
-export default routes;
+module.exports = routes;

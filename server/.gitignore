@@ -1,7 +1,3 @@
 node_modules
-dist/
-dist/public/tours
-dist/public/zips
-
-public/viewer
-public/tours
+public/
+zips/

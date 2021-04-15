@@ -1,7 +1,6 @@
-import joi from "@hapi/joi";
-import { IUser, IUserNoPassword } from '../models/User';
+const joi = require("@hapi/joi");
 
-export const registerValidation = (data: IUser) => {
+const registerValidation = (data) => {
     const schema = joi.object({
         title: joi.string().min(2).max(255).required(),
         firstName: joi.string().min(3).max(255).required(),
@@ -12,7 +11,7 @@ export const registerValidation = (data: IUser) => {
     return schema.validate(data);
 }
 
-export const loginValidation = (data: IUser) => {
+const loginValidation = (data) => {
     const schema = joi.object({
         email: joi.string().min(6).max(255).email().required(),
         password: joi.string().min(6).max(1025).required()
@@ -20,14 +19,14 @@ export const loginValidation = (data: IUser) => {
     return schema.validate(data);
 }
 
-export const validatePassword = (pass: string) => {
+const validatePassword = (pass) => {
     const schema = joi.object({
         password: joi.string().min(6).max(1025).required()
     });
     return schema.validate({ password: pass });
 }
 
-export const validateUpdatedUser = (data: IUser) => {
+const validateUpdatedUser = (data) => {
     const schema = joi.object({
         title: joi.string().min(2).max(255).required(),
         firstName: joi.string().min(3).max(255).required(),
@@ -37,8 +36,8 @@ export const validateUpdatedUser = (data: IUser) => {
     return schema.validate(data);
 }
 
-export const toUserNoPassword = (user: IUser): IUserNoPassword => {
-    let userNoPass: IUserNoPassword = {
+const toUserNoPassword = (user) => {
+    let userNoPass = {
         _id: user._id,
         title: user.title,
         firstName: user.firstName,
@@ -49,3 +48,10 @@ export const toUserNoPassword = (user: IUser): IUserNoPassword => {
     }
     return userNoPass;
 }
+
+
+module.exports.registerValidation = registerValidation;
+module.exports.loginValidation = loginValidation;
+module.exports.validatePassword = validatePassword;
+module.exports.validateUpdatedUser = validateUpdatedUser;
+module.exports.toUserNoPassword = toUserNoPassword;

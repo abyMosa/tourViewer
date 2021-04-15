@@ -1,11 +1,10 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-
-export interface IToken extends mongoose.Document {
-    user: string;
-    token: string;
-    createdAt: Date;
-}
+// export interface IToken extends mongoose.Document {
+//     user: string;
+//     token: string;
+//     createdAt: Date;
+// }
 
 const tokenSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true, },
@@ -14,4 +13,4 @@ const tokenSchema = new mongoose.Schema({
 });
 
 
-export default mongoose.model<IToken>("Token", tokenSchema);
+module.exports = mongoose.model("Token", tokenSchema);

@@ -1,13 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
-import { IUser } from '../models/User';
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+const verifyToken = (req, res, next) => {
     const token = req.header('auth-token');
     if (!token) return res.status(401).send('Access Denied!');
 
     try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET!);
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
         next();
 
     } catch (err) {
@@ -15,7 +13,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     }
 }
 
-export const generateToken = (user: IUser) => {
+const generateToken = (user) => {
     const token = jwt.sign(
         {
             _id: user._id,
@@ -26,7 +24,12 @@ export const generateToken = (user: IUser) => {
             registered: user.registered,
             role: user.role
         },
-        process.env.TOKEN_SECRET!
+        process.env.TOKEN_SECRET
     );
     return token;
 }
+
+
+
+module.exports.verifyToken = verifyToken;
+module.exports.generateToken = generateToken;

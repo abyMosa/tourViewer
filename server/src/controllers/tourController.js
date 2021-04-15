@@ -1,19 +1,16 @@
-import { Request, Response } from "express";
-import Tour, { ITour } from "../models/Tour";
-import User from "../models/User";
-import mongoose from 'mongoose';
-// import AWS from "aws-sdk";
-import { AWSS3 } from "../../awssdk";
+const Tour = require("../models/Tour");
+const User = require("../models/User");
+const mongoose = require('mongoose');
 // import decompress from 'decompress';
-import path from "path";
-import fs from "fs";
+const path = require("path");
+const fs = require("fs");
 // import { tourUploader } from "../routes/uploadMiddleware";
 // import multer from 'multer';
 // import extract from 'extract-zip';
 // import DecompressZip from 'decompress-zip';
 
 
-export let getTour = async (req: Request, res: Response) => {
+const getTour = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ message: "Invalid tour id!" });
 
@@ -27,7 +24,7 @@ export let getTour = async (req: Request, res: Response) => {
     return res.status(200).send(tour);
 };
 
-export let deleteTour = async (req: Request, res: Response) => {
+const deleteTour = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ message: "Invalid tour id!" });
 
@@ -70,12 +67,12 @@ export let deleteTour = async (req: Request, res: Response) => {
 };
 
 
-export let getAllTours = async (req: Request, res: Response) => {
+const getAllTours = async (req, res) => {
     let tours = await Tour.find().sort({ createdAt: -1 });
     res.status(200).send(tours);
 };
 
-export let getUserTours = async (req: Request, res: Response) => {
+const getUserTours = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ message: "Invalid user id!" });
 
@@ -92,9 +89,9 @@ export let getUserTours = async (req: Request, res: Response) => {
 };
 
 
-export let addTour = async (req: Request, res: any) => {
+const addTour = async (req, res) => {
 
-    // tourUploader(req, res, async (err: any) => {
+    // tourUploader(req, res, async (err) => {
 
     if (!req.body.user)
         return res.status(400).send({ error: true, message: "user is required!" });
@@ -165,7 +162,7 @@ export let addTour = async (req: Request, res: any) => {
     //     // restrict: true
     // });
 
-    // unzipper.on('error', function (err: any) {
+    // unzipper.on('error', function (err) {
     //     // console.log('Caught an error');
     //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: err });
     // });
@@ -216,92 +213,29 @@ export let addTour = async (req: Request, res: any) => {
 
 };
 
-const getStoragePaths = (p: string, id: string) => {
+const getStoragePaths = (p, id) => {
 
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = './dist/public/tours/' + urlPath;
+    const unzipPath = './public/tours/' + urlPath;
     createPublicFolder();
     return { unzipPath, urlPath }
 }
 
 const createPublicFolder = () => {
-    if (!fs.existsSync('./dist/public')) {
-        fs.mkdirSync('./dist/public');
+    if (!fs.existsSync('./public')) {
+        fs.mkdirSync('./public');
     }
 
-    if (!fs.existsSync('./dist/public/tours')) {
-        fs.mkdirSync('./dist/public/tours');
+    if (!fs.existsSync('./public/tours')) {
+        fs.mkdirSync('./public/tours');
     }
 }
 
-// export const s3sign = (req: Request, res: Response) => {
 
-//     const fileName = req.body.fileName;
-//     const fileType = req.body.fileType;
-//     // Set up the payload of what we are sending to the S3 api
-//     const s3Params = {
-//         Bucket: process.env.AWS_BUCKET_NAME,
-//         Key: fileName,
-//         Expires: 50,
-//         ContentType: fileType,
-//         ACL: 'public-read'
-//     };
-
-//     // Make a request to the S3 API to get a signed URL which we can use to upload our file
-//     AWSS3.getSignedUrl('putObject', s3Params, (err: any, data: any) => {
-//         if (err) {
-//             console.log(err);
-//             res.json({ success: false, error: err })
-//         }
-//         // Data payload of what we are sending back, the url of the signedRequest and a URL where we can access the content after its saved.
-//         const returnData = {
-//             signedRequest: data,
-//             url: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fileName}`
-//         };
-//         res.json({ success: true, aws: { returnData } });
-//     });
-// }
-
-export const s3sign = (req: Request, res: Response) => {
-
-
-    const s3Params = (fileName: string, fileType: string) => {
-        return {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: fileName,
-            Expires: 50,
-            ContentType: fileType,
-            ACL: 'public-read'
-        }
-    };
-
-    AWSS3.getSignedUrl('putObject', s3Params(req.body.image.fileName, req.body.image.fileType), (err: any, data: any) => {
-        if (err) {
-            console.log(err);
-            res.json({ success: false, error: err })
-        }
-        // Data payload of what we are sending back, the url of the signedRequest and a URL where we can access the content after its saved.
-
-        const imageReturnData = {
-            signedRequest: data,
-            url: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${req.body.image.fileName}`
-        };
-
-        AWSS3.getSignedUrl('putObject', s3Params(req.body.tour.fileName, req.body.tour.fileType), (error: any, tourData: any) => {
-            if (error) {
-                console.log(error);
-                res.json({ success: false, error: error })
-            }
-            const tourReturnData = {
-                signedRequest: tourData,
-                url: `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${req.body.tour.fileName}`
-            };
-
-            res.json({ success: true, aws: { image: imageReturnData, tour: tourReturnData } });
-        })
-
-
-    });
-}
+module.exports.getTour = getTour;
+module.exports.deleteTour = deleteTour;
+module.exports.getAllTours = getAllTours;
+module.exports.getUserTours = getUserTours;
+module.exports.addTour = addTour;

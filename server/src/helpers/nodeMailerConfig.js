@@ -1,16 +1,8 @@
-import { createTransport } from 'nodemailer';
-import Mail from 'nodemailer/lib/mailer';
-import { IUser } from '../models/User';
+const { createTransport } = require('nodemailer');
+const Mail = require('nodemailer/lib/mailer');
 
-export interface MailArgs {
-    to: string;
-    subject: string;
-    text?: string;
-    html?: string;
-    // cb: (error: (Error | null), success: any) => void
-}
 
-export const transport = createTransport({
+const transport = createTransport({
     host: 'smtp.ionos.co.uk',
     port: 587,
     auth: {
@@ -19,8 +11,8 @@ export const transport = createTransport({
     }
 });
 
-export const sendEmail = async (mailArgs: MailArgs): Promise<any> => {
-    const message: Mail.Options = {
+const sendEmail = async (mailArgs) => {
+    const message = {
         from: 'info@inspirepress.co.uk',
         ...mailArgs
     }
@@ -35,7 +27,7 @@ export const sendEmail = async (mailArgs: MailArgs): Promise<any> => {
 }
 
 
-export const sendResetLinkEmail = async (user: IUser, link: string): Promise<any> => {
+const sendResetLinkEmail = async (user, link) => {
 
     return sendEmail({
         to: user.email,
@@ -57,7 +49,7 @@ export const sendResetLinkEmail = async (user: IUser, link: string): Promise<any
     });
 }
 
-export const sendPasswordResetSuccessfulEmail = (user: IUser): Promise<any> => {
+const sendPasswordResetSuccessfulEmail = (user) => {
     return sendEmail({
         to: user.email,
         subject: "Reset Password Successfull",
@@ -73,3 +65,9 @@ export const sendPasswordResetSuccessfulEmail = (user: IUser): Promise<any> => {
         // }
     });
 }
+
+
+module.exports.transport = transport;
+module.exports.sendEmail = sendEmail;
+module.exports.sendResetLinkEmail = sendResetLinkEmail;
+module.exports.sendPasswordResetSuccessfulEmail = sendPasswordResetSuccessfulEmail;

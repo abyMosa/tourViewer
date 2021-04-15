@@ -1,18 +1,21 @@
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const setUploadFolder = () => {
+    if (!fs.existsSync('./zips')) {
+        fs.mkdirSync('./zips');
+    }
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // cb(null, process.env.uploadPath!);
-        cb(null, './dist/zips');
+        cb(null, './zips');
     },
     filename: (req, file, cb) => {
-        if (!fs.existsSync('./dist/zips')) {
-            fs.mkdirSync('./dist/zips');
-        }
 
-        const filePath = path.join('./dist/zips', file.originalname);
+        const filePath = path.join('./zips', file.originalname);
         req.body.filePath = filePath;
         cb(null, file.originalname);
     },
@@ -26,4 +29,5 @@ const upload = multer({
     }
 });
 
-export const tourUploader = upload.single('tour');
+module.exports.tourUploader = upload.single('tour');
+module.exports.setUploadFolder = setUploadFolder;
