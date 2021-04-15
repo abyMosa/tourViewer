@@ -122,10 +122,10 @@ export let addTour = async (req: Request, res: any) => {
 
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
-            res.status(400).send(err);
+            return res.status(400).send(err);
         } else if (err) {
             // An unknown error occurred when uploading.
-            res.status(400).send(err);
+            return res.status(400).send(err);
         }
 
         // if req.body.filePath is undefined fail TODO::
