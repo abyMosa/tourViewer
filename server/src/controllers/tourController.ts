@@ -175,7 +175,9 @@ const getStoragePaths = (p: string, id: string) => {
 const createPublicFolder = () => {
     if (!fs.existsSync('./dist/public')) {
         fs.mkdirSync('./dist/public');
-    } else if (!fs.existsSync('./dist/public/tours')) {
+    }
+
+    if (!fs.existsSync('./dist/public/tours')) {
         fs.mkdirSync('./dist/public/tours');
     }
 }
