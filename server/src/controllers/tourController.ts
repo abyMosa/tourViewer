@@ -140,6 +140,8 @@ export let addTour = async (req: Request, res: any) => {
         });
     }
 
+    return res.send({ filePath: req.body.filePath });
+
     // if (err instanceof multer.MulterError) {
     //     // A Multer error occurred when uploading.
     //     res.status(400).send(err);
@@ -150,7 +152,9 @@ export let addTour = async (req: Request, res: any) => {
 
     // if req.body.filePath is undefined fail TODO::
 
-    const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
+    // const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
+
+    const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, '23132');
 
     try {
         await decompress(req.body.filePath, unzipPath);
@@ -182,38 +186,6 @@ export let addTour = async (req: Request, res: any) => {
 
     // })
 
-
-    // // if req.body.filePath is undefined fail TODO::
-
-    // const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
-
-    // try {
-    //     await decompress(req.body.filePath, unzipPath);
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-
-    // } catch (error) {
-    //     console.log(error);
-    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
-    // }
-
-    // const tour: ITour = new Tour({
-    //     name: req.body.name,
-    //     url: 'tours/' + urlPath,
-    //     user: req.body.user,
-    // });
-
-    // try {
-    //     const addedTour = await tour.save();
-    //     res.send(addedTour);
-
-    // } catch (error) {
-    //     let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-    //     res.status(400).send({ error: true, message: errs.join(', ') });
-    // }
 };
 
 const getStoragePaths = (p: string, id: string) => {
