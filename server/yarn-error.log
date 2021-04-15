@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add zlib @types/zlib
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add @types/decompress-zip
 
 PATH: 
   C:\Users\dre7a\cmder\vendor\bin;C:\Users\dre7a\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\Users\dre7a\cmder\vendor\conemu-maximus5;C:\Users\dre7a\cmder\vendor\conemu-maximus5\ConEmu;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\MongoDB\Server\4.4\bin;C:\Program Files (x86)\Elm\0.19.1\bin;C:\Users\dre7a\AppData\Local\Microsoft\WindowsApps;C:\Users\dre7a\AppData\Roaming\npm;C:\Users\dre7a\AppData\Local\Yarn\bin;C:\Users\dre7a\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\dre7a\cmder
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fzlib: Not found
+  Error: https://registry.yarnpkg.com/@types%2fdecompress-zip: Not found
       at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:66097:18)
       at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:140749:22)
       at Request.emit (events.js:315:20)
@@ -36,7 +36,8 @@ npm manifest:
       "watch-ts": "tsc -w",
       "watch-nodemon": "nodemon dist/index.js",
       "watch-node": "node dist/index.js",
-      "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\""
+      "start": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
+      "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"yarn run watch-ts\" \"yarn run watch-nodemon\""
     },
     "author": "",
     "license": "ISC",
@@ -54,8 +55,10 @@ npm manifest:
       "bcryptjs": "^2.4.3",
       "concurrently": "^6.0.0",
       "decompress": "^4.2.1",
+      "decompress-zip": "^0.3.3",
       "dotenv": "^8.2.0",
       "express": "^4.17.1",
+      "extract-zip": "^2.0.1",
       "jsonwebtoken": "^8.5.1",
       "mongoose": "^5.11.15",
       "multer": "^1.4.2",
@@ -312,6 +315,13 @@ Lockfile:
     dependencies:
       uuidv4 "*"
   
+  "@types/yauzl@^2.9.1":
+    version "2.9.1"
+    resolved "https://registry.yarnpkg.com/@types/yauzl/-/yauzl-2.9.1.tgz#d10f69f9f522eef3cf98e30afb684a1e1ec923af"
+    integrity sha512-A1b8SU4D10uoPjwb0lnHmmu8wZhR9d+9o2PKBQT2jU5YPTKsxac6M2qGAdY7VcL+dHHhARVUDmeg0rOrcd9EjA==
+    dependencies:
+      "@types/node" "*"
+  
   abbrev@1:
     version "1.1.1"
     resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -408,6 +418,14 @@ Lockfile:
     version "2.2.0"
     resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
     integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
+  
+  binary@^0.3.0:
+    version "0.3.0"
+    resolved "https://registry.yarnpkg.com/binary/-/binary-0.3.0.tgz#9f60553bc5ce8c3386f3b553cff47462adecaa79"
+    integrity sha1-n2BVO8XOjDOG87VTz/R0Yq3sqnk=
+    dependencies:
+      buffers "~0.1.1"
+      chainsaw "~0.1.0"
   
   bl@^1.0.0:
     version "1.2.3"
@@ -530,6 +548,11 @@ Lockfile:
       base64-js "^1.3.1"
       ieee754 "^1.1.13"
   
+  buffers@~0.1.1:
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/buffers/-/buffers-0.1.1.tgz#b24579c3bed4d6d396aeee6d9a8ae7f5482ab7bb"
+    integrity sha1-skV5w77U1tOWru5tmorn9Ugqt7s=
+  
   busboy@^0.2.11:
     version "0.2.14"
     resolved "https://registry.yarnpkg.com/busboy/-/busboy-0.2.14.tgz#6c2a622efcf47c57bbbe1e2a9c37ad36c7925453"
@@ -560,6 +583,13 @@ Lockfile:
     version "5.3.1"
     resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
     integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
+  
+  chainsaw@~0.1.0:
+    version "0.1.0"
+    resolved "https://registry.yarnpkg.com/chainsaw/-/chainsaw-0.1.0.tgz#5eab50b28afe58074d0d58291388828b5e5fbc98"
+    integrity sha1-XqtQsor+WAdNDVgpE4iCi15fvJg=
+    dependencies:
+      traverse ">=0.3.0 <0.4"
   
   chalk@^2.0.0:
     version "2.4.2"
@@ -764,6 +794,13 @@ Lockfile:
     dependencies:
       ms "^2.1.1"
   
+  debug@^4.1.1:
+    version "4.3.1"
+    resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
+    integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
+    dependencies:
+      ms "2.1.2"
+  
   decompress-response@^3.3.0:
     version "3.3.0"
     resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-3.3.0.tgz#80a4dd323748384bfa248083622aedec982adff3"
@@ -809,6 +846,19 @@ Lockfile:
       get-stream "^2.2.0"
       pify "^2.3.0"
       yauzl "^2.4.2"
+  
+  decompress-zip@^0.3.3:
+    version "0.3.3"
+    resolved "https://registry.yarnpkg.com/decompress-zip/-/decompress-zip-0.3.3.tgz#71469aca39003e360a4044d6a6a9f64a1bef5a49"
+    integrity sha512-/fy1L4s+4jujqj3kNptWjilFw3E6De8U6XUFvqmh4npN3Vsypm3oT2V0bXcmbBWS+5j5tr4okYaFrOmyZkszEg==
+    dependencies:
+      binary "^0.3.0"
+      graceful-fs "^4.1.3"
+      mkpath "^0.1.0"
+      nopt "^3.0.1"
+      q "^1.1.2"
+      readable-stream "^1.1.8"
+      touch "0.0.3"
   
   decompress@^4.2.1:
     version "4.2.1"
@@ -981,6 +1031,17 @@ Lockfile:
       utils-merge "1.0.1"
       vary "~1.1.2"
   
+  extract-zip@^2.0.1:
+    version "2.0.1"
+    resolved "https://registry.yarnpkg.com/extract-zip/-/extract-zip-2.0.1.tgz#663dca56fe46df890d5f131ef4a06d22bb8ba13a"
+    integrity sha512-GDhU9ntwuKyGXdZBUgTIe+vXnWj0fppUEtMDL0+idd5Sta8TGpHssn/eusA9mrPr9qNDym6SxAYZjNvCn/9RBg==
+    dependencies:
+      debug "^4.1.1"
+      get-stream "^5.1.0"
+      yauzl "^2.10.0"
+    optionalDependencies:
+      "@types/yauzl" "^2.9.1"
+  
   fd-slicer@~1.1.0:
     version "1.1.0"
     resolved "https://registry.yarnpkg.com/fd-slicer/-/fd-slicer-1.1.0.tgz#25c7c89cb1f9077f8891bbe61d8f390eae256f1e"
@@ -1106,7 +1167,7 @@ Lockfile:
       to-readable-stream "^1.0.0"
       url-parse-lax "^3.0.0"
   
-  graceful-fs@^4.1.10, graceful-fs@^4.1.2:
+  graceful-fs@^4.1.10, graceful-fs@^4.1.2, graceful-fs@^4.1.3:
     version "4.2.6"
     resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.6.tgz#ff040b2b0853b23c3d31027523706f1885d76bee"
     integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
@@ -1530,6 +1591,11 @@ Lockfile:
     dependencies:
       minimist "^1.2.5"
   
+  mkpath@^0.1.0:
+    version "0.1.0"
+    resolved "https://registry.yarnpkg.com/mkpath/-/mkpath-0.1.0.tgz#7554a6f8d871834cc97b5462b122c4c124d6de91"
+    integrity sha1-dVSm+Nhxg0zJe1RisSLEwSTW3pE=
+  
   mongodb@3.6.5:
     version "3.6.5"
     resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.6.5.tgz#c27d786fd4d3c83dc19302483707d12a9d2aee5f"
@@ -1641,6 +1707,13 @@ Lockfile:
       touch "^3.1.0"
       undefsafe "^2.0.3"
       update-notifier "^4.1.0"
+  
+  nopt@^3.0.1:
+    version "3.0.6"
+    resolved "https://registry.yarnpkg.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
+    integrity sha1-xkZdvwirzU2zWTF/eaxopkayj/k=
+    dependencies:
+      abbrev "1"
   
   nopt@~1.0.10:
     version "1.0.10"
@@ -1803,6 +1876,11 @@ Lockfile:
     dependencies:
       escape-goat "^2.0.0"
   
+  q@^1.1.2:
+    version "1.5.1"
+    resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
+    integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
+  
   qs@6.7.0:
     version "6.7.0"
     resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
@@ -1848,7 +1926,7 @@ Lockfile:
       parse-json "^5.0.0"
       type-fest "^0.6.0"
   
-  readable-stream@1.1.x:
+  readable-stream@1.1.x, readable-stream@^1.1.8:
     version "1.1.14"
     resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.1.14.tgz#7cf4c54ef648e3813084c636dd2079e166c081d9"
     integrity sha1-fPTFTvZI44EwhMY23SB54WbAgdk=
@@ -2212,12 +2290,24 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
     integrity sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==
   
+  touch@0.0.3:
+    version "0.0.3"
+    resolved "https://registry.yarnpkg.com/touch/-/touch-0.0.3.tgz#51aef3d449571d4f287a5d87c9c8b49181a0db1d"
+    integrity sha1-Ua7z1ElXHU8oel2Hyci0kYGg2x0=
+    dependencies:
+      nopt "~1.0.10"
+  
   touch@^3.1.0:
     version "3.1.0"
     resolved "https://registry.yarnpkg.com/touch/-/touch-3.1.0.tgz#fe365f5f75ec9ed4e56825e0bb76d24ab74af83b"
     integrity sha512-WBx8Uy5TLtOSRtIq+M03/sKDrXCLHxwDcquSP2c43Le03/9serjQBIztjRz6FkJez9D/hleyAXTBGLwwZUw9lA==
     dependencies:
       nopt "~1.0.10"
+  
+  "traverse@>=0.3.0 <0.4":
+    version "0.3.9"
+    resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.3.9.tgz#717b8f220cc0bb7b44e40514c22b2e8bbc70d8b9"
+    integrity sha1-cXuPIgzAu3tE5AUUwisui7xw2Lk=
   
   tree-kill@^1.2.2:
     version "1.2.2"
@@ -2438,7 +2528,7 @@ Lockfile:
       y18n "^5.0.5"
       yargs-parser "^20.2.2"
   
-  yauzl@^2.4.2:
+  yauzl@^2.10.0, yauzl@^2.4.2:
     version "2.10.0"
     resolved "https://registry.yarnpkg.com/yauzl/-/yauzl-2.10.0.tgz#c7eb17c93e112cb1086fa6d8e51fb0667b79a5f9"
     integrity sha1-x+sXyT4RLLEIb6bY5R+wZnt5pfk=

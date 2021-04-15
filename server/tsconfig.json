@@ -13,6 +13,9 @@
         "sourceRoot": "./src",
         "inlineSourceMap": true,
     },
+    "include": [
+        "decs.d.ts"
+    ],
     "exclude": [
         "./node_modules/"
     ],
