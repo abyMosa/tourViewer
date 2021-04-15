@@ -161,7 +161,7 @@ export let addTour = async (req: Request, res: any) => {
         var unzipper = new DecompressZip(req.body.filePath);
         unzipper.extract({
             path: unzipPath,
-            restrict: false
+            // restrict: true
         });
 
         unzipper.on('error', function (err: any) {
@@ -218,7 +218,6 @@ const getStoragePaths = (p: string, id: string) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    // const unzipPath = './dist/public/tours/' + folderName;
     const unzipPath = './dist/public/tours/' + urlPath;
     createPublicFolder();
     return { unzipPath, urlPath }
@@ -232,11 +231,6 @@ const createPublicFolder = () => {
     if (!fs.existsSync('./dist/public/tours')) {
         fs.mkdirSync('./dist/public/tours');
     }
-
-    // if (!fs.existsSync(`./dist/public/tours/${folderName}`)) {
-    //     fs.mkdirSync(`./dist/public/tours/${folderName}`);
-    // }
-
 }
 
 // export const s3sign = (req: Request, res: Response) => {
