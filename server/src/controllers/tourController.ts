@@ -9,6 +9,7 @@ import path from "path";
 import fs from "fs";
 import { tourUploader } from "../routes/uploadMiddleware";
 import multer from 'multer';
+import extract from 'extract-zip';
 
 
 export let getTour = async (req: Request, res: Response) => {
@@ -130,8 +131,21 @@ export let addTour = async (req: Request, res: any) => {
 
         const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
+        // try {
+        //     await decompress(req.body.filePath, unzipPath);
+        //     fs.unlink(req.body.filePath, (err) => {
+        //         if (err) console.log('err:: deleting the compressed file', err);
+
+        //         console.log('zip file deleted');
+        //     })
+
+        // } catch (error) {
+        //     console.log(error);
+        //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
+        // }
+
         try {
-            await decompress(req.body.filePath, unzipPath);
+            await extract(req.body.filePath, { dir: unzipPath });
             fs.unlink(req.body.filePath, (err) => {
                 if (err) console.log('err:: deleting the compressed file', err);
 
@@ -139,7 +153,7 @@ export let addTour = async (req: Request, res: any) => {
             })
 
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
         }
 
@@ -167,13 +181,13 @@ const getStoragePaths = (p: string, id: string) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = './dist/public/tours/' + folderName;
-    // const unzipPath = './dist/public/tours/' + urlPath;
-    createPublicFolder(folderName);
+    // const unzipPath = './dist/public/tours/' + folderName;
+    const unzipPath = './dist/public/tours/' + urlPath;
+    createPublicFolder();
     return { unzipPath, urlPath }
 }
 
-const createPublicFolder = (folderName: string) => {
+const createPublicFolder = () => {
     if (!fs.existsSync('./dist/public')) {
         fs.mkdirSync('./dist/public');
     }
@@ -182,9 +196,9 @@ const createPublicFolder = (folderName: string) => {
         fs.mkdirSync('./dist/public/tours');
     }
 
-    if (!fs.existsSync(`./dist/public/tours/${folderName}`)) {
-        fs.mkdirSync(`./dist/public/tours/${folderName}`);
-    }
+    // if (!fs.existsSync(`./dist/public/tours/${folderName}`)) {
+    //     fs.mkdirSync(`./dist/public/tours/${folderName}`);
+    // }
 
 }
 
