@@ -145,7 +145,7 @@ export let addTour = async (req: Request, res: any) => {
         // }
 
         try {
-            await extract(req.body.filePath, { dir: unzipPath });
+            await extract(req.body.filePath, { dir: unzipPath, defaultDirMode: 0o777 });
             fs.unlink(req.body.filePath, (err) => {
                 if (err) console.log('err:: deleting the compressed file', err);
 
