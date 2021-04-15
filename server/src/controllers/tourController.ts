@@ -165,7 +165,7 @@ export let addTour = async (req: Request, res: any) => {
 const getStoragePaths = (p: string, id: string) => {
 
     let folderName = path.basename(p, '.zip');
-    let timeStamp = Date.now();
+    let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
     const unzipPath = './dist/public/tours/' + urlPath;
     createPublicFolder();
@@ -180,6 +180,7 @@ const createPublicFolder = () => {
     if (!fs.existsSync('./dist/public/tours')) {
         fs.mkdirSync('./dist/public/tours');
     }
+
 }
 
 // export const s3sign = (req: Request, res: Response) => {
