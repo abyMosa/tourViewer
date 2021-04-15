@@ -130,12 +130,6 @@ export let addTour = async (req: Request, res: any) => {
 
         const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
-        if (!fs.existsSync('./dist/public')) {
-            fs.mkdirSync('./dist/public');
-        } else if (!fs.existsSync('./dist/public/tours')) {
-            fs.mkdirSync('./dist/public/tours');
-        }
-
         try {
             await decompress(req.body.filePath, unzipPath);
             fs.unlink(req.body.filePath, (err) => {
@@ -174,14 +168,16 @@ const getStoragePaths = (p: string, id: string) => {
     let timeStamp = Date.now();
     const urlPath = [id, timeStamp, folderName].join('/');
     const unzipPath = './dist/public/tours/' + urlPath;
+    createPublicFolder();
     return { unzipPath, urlPath }
+}
 
-    // if (!fs.existsSync(unzipPath)) {
-    //     return { unzipPath, urlPath }
-    // } else {
-    //     const newP = 
-    //     return getStoragePath(newP, id);
-    // }
+const createPublicFolder = () => {
+    if (!fs.existsSync('./dist/public')) {
+        fs.mkdirSync('./dist/public');
+    } else if (!fs.existsSync('./dist/public/tours')) {
+        fs.mkdirSync('./dist/public/tours');
+    }
 }
 
 // export const s3sign = (req: Request, res: Response) => {
