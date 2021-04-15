@@ -11,4 +11,4 @@ sudo systemctl restart nginx
 sudo pm2 kill
 sudo pm2 delete all
 sudo pm2 stop all
-sudo pm2 start /var/www/rowilab/server/dist/index.js --name "server"
+sudo pm2 start /var/www/rowilab/server/index.js --name "server"
