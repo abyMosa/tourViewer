@@ -17,9 +17,9 @@ phases:
   build:
     commands:
       - npm run build
-      - cd ..
-      - cd server
-      - yarn
+      # - cd ..
+      # - cd server
+      # - yarn
       # - tsc
   post_build:
     commands:

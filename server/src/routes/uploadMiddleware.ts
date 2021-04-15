@@ -6,18 +6,18 @@ const storage = multer.diskStorage({
         // cb(null, process.env.uploadPath!);
 
         // let uploadPath = process.env.NODE
-        cb(null, './zips');
+        cb(null, './dist/zips');
     },
     filename: (req, file, cb) => {
-        const filePath = path.join('./zips', file.originalname);
+        const filePath = path.join('./dist/zips', file.originalname);
         req.body.filePath = filePath;
         cb(null, file.originalname);
     },
 });
 
 const upload = multer({
-    // storage,
-    dest: './zips',
+    storage,
+    // dest: './zips',
     fileFilter: (req, file, cb) => {
         cb(null, path.extname(file.originalname) === '.zip');
     }
