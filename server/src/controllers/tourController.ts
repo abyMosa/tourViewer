@@ -129,7 +129,7 @@ export let addTour = async (req: Request, res: any) => {
     if (!user) {
         return res.status(400).send({
             error: true,
-            message: `Could not find a user with id ${req.body.device}`
+            message: `Could not find a user with id ${req.body.user}`
         });
     }
 
