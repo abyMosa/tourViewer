@@ -114,7 +114,6 @@ const AddTour = () => {
                     setIsLoading(false);
                     setEvents(event => [...event, EventType.UploadFailed]);
                 })
-
         }
 
     }
