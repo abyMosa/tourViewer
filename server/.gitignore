@@ -1,4 +1,5 @@
 node_modules
+dist/
 dist/public/tours
 dist/public/zips
 
