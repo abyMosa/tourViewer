@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import * as userController from "../controllers/userController";
 import * as tourController from "../controllers/tourController";
 import { verifyToken } from '../helpers/verifyToken';
-import { tourUploader } from "../routes/uploadMiddleware";
+// import { tourUploader } from "../routes/uploadMiddleware";
 
 const routes = Router();
 
@@ -22,10 +22,10 @@ routes.patch('/user/:id', verifyToken, userController.updateUser);
 
 // Tour
 routes.get('/tour/:id', tourController.getTour);
-// routes.post('/tour', tourController.addTour);
+routes.post('/tour', tourController.addTour);
 
 // routes.post('/tour', verifyToken, tourController.addTour);
-routes.post('/tour', tourUploader, tourController.addTour);
+// routes.post('/tour', tourUploader, tourController.addTour);
 // routes.post('/tour/s3sign', tourController.s3sign);
 
 routes.get('/tours', verifyToken, tourController.getAllTours);

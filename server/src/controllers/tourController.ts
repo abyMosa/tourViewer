@@ -92,99 +92,73 @@ export let getUserTours = async (req: Request, res: Response) => {
 
 export let addTour = async (req: Request, res: any) => {
 
-    // if (!req.body.user)
-    //     return res.status(400).send({ error: true, message: "user is required!" });
+    tourUploader(req, res, async (err: any) => {
 
-    // if (!mongoose.Types.ObjectId.isValid(req.body.user))
-    //     return res.status(400).send({ error: true, message: "Invalid user id!" });
+        if (!req.body.user)
+            return res.status(400).send({ error: true, message: "user is required!" });
 
-
-    // let user = await User.findById(req.body.user);
-    // if (!user) {
-    //     return res.status(400).send({
-    //         error: true,
-    //         message: `Could not find a user with id ${req.body.device}`
-    //     });
-    // }
+        if (!mongoose.Types.ObjectId.isValid(req.body.user))
+            return res.status(400).send({ error: true, message: "Invalid user id!" });
 
 
-    // if (!req.body.filePath) {
-    //     return res.status(400).send({
-    //         error: true,
-    //         message: `Could not find a req.body.filePath ${req.body.filePath}`
-    //     });
-    // }
+        let user = await User.findById(req.body.user);
+        if (!user) {
+            return res.status(400).send({
+                error: true,
+                message: `Could not find a user with id ${req.body.user}`
+            });
+        }
 
-    // tourUploader(req, res, async (err: any) => {
+        if (!req.body.filePath) {
+            return res.status(400).send({
+                error: true,
+                message: `Could not find a req.body.filePath ${req.body.filePath}`
+            });
+        }
+        // else { return res.send({ filePath: req.body.filePath }); }
 
 
-    if (!req.body.user)
-        return res.status(400).send({ error: true, message: "user is required!" });
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            res.status(400).send(err);
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            res.status(400).send(err);
+        }
 
-    if (!mongoose.Types.ObjectId.isValid(req.body.user))
-        return res.status(400).send({ error: true, message: "Invalid user id!" });
+        // if req.body.filePath is undefined fail TODO::
 
+        const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
-    let user = await User.findById(req.body.user);
-    if (!user) {
-        return res.status(400).send({
-            error: true,
-            message: `Could not find a user with id ${req.body.user}`
+        try {
+            await decompress(req.body.filePath, unzipPath);
+            fs.unlink(req.body.filePath, (err) => {
+                if (err) console.log('err:: deleting the compressed file', err);
+
+                console.log('zip file deleted');
+            })
+
+        } catch (error) {
+            console.log(error);
+            return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
+        }
+
+        const tour: ITour = new Tour({
+            name: req.body.name,
+            url: 'tours/' + urlPath,
+            user: req.body.user,
         });
-    }
 
-    if (!req.body.filePath) {
-        return res.status(400).send({
-            error: true,
-            message: `Could not find a req.body.filePath ${req.body.filePath}`
-        });
-    }
+        try {
+            const addedTour = await tour.save();
+            res.send(addedTour);
 
-    return res.send({ filePath: req.body.filePath });
+        } catch (error) {
+            let errs = Object.keys(error.errors).map(er => error.errors[er].message);
+            res.status(400).send({ error: true, message: errs.join(', ') });
+        }
 
-    // if (err instanceof multer.MulterError) {
-    //     // A Multer error occurred when uploading.
-    //     res.status(400).send(err);
-    // } else if (err) {
-    //     // An unknown error occurred when uploading.
-    //     res.status(400).send(err);
-    // }
-
-    // if req.body.filePath is undefined fail TODO::
-
-    // const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
-
-    const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, '23132');
-
-    try {
-        await decompress(req.body.filePath, unzipPath);
-        fs.unlink(req.body.filePath, (err) => {
-            if (err) console.log('err:: deleting the compressed file', err);
-
-            console.log('zip file deleted');
-        })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
-    }
-
-    const tour: ITour = new Tour({
-        name: req.body.name,
-        url: 'tours/' + urlPath,
-        user: req.body.user,
-    });
-
-    try {
-        const addedTour = await tour.save();
-        res.send(addedTour);
-
-    } catch (error) {
-        let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-        res.status(400).send({ error: true, message: errs.join(', ') });
-    }
-
-    // })
+    })
 
 };
 
