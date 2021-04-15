@@ -141,7 +141,6 @@ export let addTour = async (req: Request, res: any) => {
             return res.status(200);
         })
 
-
         // try {
         //     await decompress(req.body.filePath, unzipPath);
         //     fs.unlink(req.body.filePath, (err) => {
