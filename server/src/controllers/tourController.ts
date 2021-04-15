@@ -7,8 +7,8 @@ import { AWSS3 } from "../../awssdk";
 // import decompress from 'decompress';
 import path from "path";
 import fs from "fs";
-import { tourUploader } from "../routes/uploadMiddleware";
-import multer from 'multer';
+// import { tourUploader } from "../routes/uploadMiddleware";
+// import multer from 'multer';
 // import extract from 'extract-zip';
 // import DecompressZip from 'decompress-zip';
 
