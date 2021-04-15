@@ -218,19 +218,8 @@ const getStoragePaths = (p, id) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = './public/tours/' + urlPath;
-    createPublicFolder();
+    const unzipPath = [process.env.toursPublicPath, urlPath].join('/');
     return { unzipPath, urlPath }
-}
-
-const createPublicFolder = () => {
-    if (!fs.existsSync('./public')) {
-        fs.mkdirSync('./public');
-    }
-
-    if (!fs.existsSync('./public/tours')) {
-        fs.mkdirSync('./public/tours');
-    }
 }
 
 
