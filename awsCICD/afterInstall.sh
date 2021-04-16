@@ -8,7 +8,7 @@ sudo chown -R ubuntu:ubuntu /var/www/rowilabViewer
 # cd /var/www/rowilab/server && ls -al
 # cd /var/www/rowilab/server && tsc
 sudo systemctl restart nginx
-sudo pm2 kill
-sudo pm2 delete all
-sudo pm2 stop all
-sudo pm2 start /var/www/rowilab/server/index.js --name "server"
+pm2 kill
+pm2 delete all
+pm2 stop all
+pm2 start /var/www/rowilab/server/index.js --name "server"

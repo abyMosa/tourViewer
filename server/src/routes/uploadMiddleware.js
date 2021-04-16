@@ -18,7 +18,7 @@ const setUploadFolder = () => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.uploadPath);
+        cb(null, process.env.uploadPath + '/');
     },
     filename: (req, file, cb) => {
 
