@@ -5,22 +5,29 @@ const fs = require('fs');
 
 const setUploadFolder = () => {
 
-    if (!fs.existsSync(process.env.uploadPath)) {
-        fs.mkdirSync(process.env.uploadPath);
+    const pathToUpload = path.resolve(rootDir, process.env.uploadPath);
+    const pathToPublic = path.resolve(rootDir, 'public');
+    const pathToPublicTours = path.resolve(rootDir, process.env.toursPublicPath);
+
+    // console.log(pathToUpload, pathToPublic, pathToPublicTours);
+
+    if (!fs.existsSync(pathToUpload)) {
+        fs.mkdirSync(pathToUpload);
     }
 
-    if (!fs.existsSync('./public')) {
-        fs.mkdirSync('./public');
+    if (!fs.existsSync(pathToPublic)) {
+        fs.mkdirSync(pathToPublic);
     }
 
-    if (!fs.existsSync(process.env.toursPublicPath)) {
-        fs.mkdirSync(process.env.toursPublicPath);
+    if (!fs.existsSync(pathToPublicTours)) {
+        fs.mkdirSync(pathToPublicTours);
     }
 }
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.uploadPath);
+        const pathToUpload = path.resolve(rootDir, process.env.uploadPath);
+        cb(null, pathToUpload);
     },
     filename: (req, file, cb) => {
         const pathToUpload = path.resolve(rootDir, process.env.uploadPath);
