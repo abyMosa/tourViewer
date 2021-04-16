@@ -199,7 +199,7 @@ const AddTour = () => {
                         <HeadLine title="Add Tour" className="mb-4 mt-1" />
                         <Loader show={isAddingTour || loading} />
 
-                        <form onSubmit={onSubmit}>
+                        <form onSubmit={onSubmit} encType="multipart/form-data">
 
                             <TextInput
                                 name="name"
