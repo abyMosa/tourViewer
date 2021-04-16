@@ -8,7 +8,7 @@ const { setUploadFolder } = require('./src/routes/uploadMiddleware');
 
 const app = express();
 const port = 5000;
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 setUploadFolder();
 
