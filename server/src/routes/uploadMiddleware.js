@@ -3,6 +3,9 @@ const path = require('path');
 const fs = require('fs');
 
 const setUploadFolder = () => {
+    console.log('process.env.uploadPath', process.env.uploadPath);
+    console.log('process.env.toursPublicPath', process.env.toursPublicPath);
+
     if (!fs.existsSync(process.env.uploadPath)) {
         fs.mkdirSync(process.env.uploadPath);
     }
