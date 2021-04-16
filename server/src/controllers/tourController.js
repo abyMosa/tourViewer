@@ -5,10 +5,6 @@ const decompress = require('decompress');
 const path = require("path");
 const rootDir = require('../helpers/path');
 const fs = require("fs");
-// const { tourUploader } = require("../routes/uploadMiddleware");
-// import multer from 'multer';
-// const extract = require('extract-zip');
-// import DecompressZip from 'decompress-zip';
 
 
 const getTour = async (req, res) => {
@@ -132,20 +128,6 @@ const addTour = async (req, res) => {
         return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error, filePath: req.body.filePath });
     }
 
-    // try {
-    //     await extract(req.body.filePath, { dir: unzipPath, defaultDirMode: 0o777 });
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-
-    // } catch (error) {
-    //     // console.log(error);
-    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error });
-    // }
-
-
     const tour = new Tour({
         name: req.body.name,
         url: 'tours/' + urlPath,
@@ -170,7 +152,7 @@ const getStoragePaths = (p, id) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = path.resolve(rootDir, process.env.toursPublicPath, timeStamp, folderName);
+    const unzipPath = path.resolve(rootDir, process.env.toursPublicPath, urlPath);
     console.log(unzipPath);
 
     return { unzipPath, urlPath }
