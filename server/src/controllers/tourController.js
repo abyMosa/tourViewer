@@ -34,8 +34,14 @@ const deleteTour = async (req, res) => {
     }
 
     try {
+        let tourseg = tour.url.split('/');
+        tourseg.pop();
+        tourseg.shift();
+        const tourUrl = tourseg.join('/');
+        const tourPath = path.join(rootDir, process.env.toursPublicPath, tourUrl);
+        console.log(tourPath);
 
-        fs.rmdir('./dist/public/' + tour.url, { recursive: true }, async (err) => {
+        fs.rmdir(tourPath, { recursive: true }, async (err) => {
             if (err) {
                 console.log("Not Folder", err);
                 return res.status(400).send({
@@ -55,6 +61,21 @@ const deleteTour = async (req, res) => {
         });
 
 
+        // let deleted = removeDir(tourPath);
+
+        // if (!deleted) {
+        //     return res.status(400).send({ error: true, message: 'unexpected error deleted false' })
+
+        // } else {
+        //     if (tour) {
+        //         const deleted = await tour.delete();
+        //         return res.status(200).send(deleted);
+        //     } else {
+        //         return res.status(500).send({ error: true, message: 'unexpected error' })
+        //     }
+        // }
+
+
     } catch (error) {
         return res.status(400).send({
             error: true,
@@ -63,6 +84,28 @@ const deleteTour = async (req, res) => {
     }
 };
 
+const removeDir = (path) => {
+    if (fs.existsSync(path)) {
+        const files = fs.readdirSync(path);
+
+        if (files.length > 0) {
+            files.forEach(function (filename) {
+                if (fs.statSync(path + "/" + filename).isDirectory()) {
+                    removeDir(path + "/" + filename);
+                } else {
+                    fs.unlinkSync(path + "/" + filename);
+                }
+            })
+            fs.rmdirSync(path);
+        } else {
+            fs.rmdirSync(path);
+        }
+
+        return true;
+    } else {
+        return false;
+    }
+}
 
 const getAllTours = async (req, res) => {
     let tours = await Tour.find().sort({ createdAt: -1 });
