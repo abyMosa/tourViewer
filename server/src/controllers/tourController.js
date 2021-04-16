@@ -129,7 +129,7 @@ const addTour = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
+        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error, filePath: req.body.filePath });
     }
 
     // try {
