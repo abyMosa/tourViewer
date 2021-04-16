@@ -1,10 +1,10 @@
 const Tour = require("../models/Tour");
 const User = require("../models/User");
 const mongoose = require('mongoose');
-// import decompress from 'decompress';
+const decompress = require('decompress');
 const path = require("path");
 const fs = require("fs");
-// import { tourUploader } from "../routes/uploadMiddleware";
+// const { tourUploader } = require("../routes/uploadMiddleware");
 // import multer from 'multer';
 // import extract from 'extract-zip';
 // import DecompressZip from 'decompress-zip';
@@ -90,7 +90,6 @@ const getUserTours = async (req, res) => {
 
 
 const addTour = async (req, res) => {
-
     // tourUploader(req, res, async (err) => {
 
     if (!req.body.user)
@@ -114,34 +113,21 @@ const addTour = async (req, res) => {
             message: `Could not find a req.body.filePath ${req.body.filePath}`
         });
     }
-    // else { return res.send({ filePath: req.body.filePath }); }
-
-
-    // if req.body.filePath is undefined fail TODO::
 
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
-    fs.unlink(req.body.filePath, (err) => {
-        if (err) {
-            console.log('err:: deleting the compressed file', err);
-            return res.status(400).send(err);
-        }
+    try {
+        await decompress(req.body.filePath, unzipPath);
+        fs.unlink(req.body.filePath, (err) => {
+            if (err) console.log('err:: deleting the compressed file', err);
 
-        return res.status(200).send('done');
-    })
+            console.log('zip file deleted');
+        })
 
-    // try {
-    //     await decompress(req.body.filePath, unzipPath);
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-
-    // } catch (error) {
-    //     console.log(error);
-    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
-    // }
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?" });
+    }
 
     // try {
     //     await extract(req.body.filePath, { dir: unzipPath, defaultDirMode: 0o777 });
@@ -156,60 +142,23 @@ const addTour = async (req, res) => {
     //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error });
     // }
 
-    // var unzipper = new DecompressZip(req.body.filePath);
-    // unzipper.extract({
-    //     path: unzipPath,
-    //     // restrict: true
-    // });
 
-    // unzipper.on('error', function (err) {
-    //     // console.log('Caught an error');
-    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: err });
-    // });
+    const tour = new Tour({
+        name: req.body.name,
+        url: 'tours/' + urlPath,
+        user: req.body.user,
+    });
 
-    // unzipper.on('extract', async () => {
+    try {
+        const addedTour = await tour.save();
+        res.send(addedTour);
 
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-
-    //     const tour: ITour = new Tour({
-    //         name: req.body.name,
-    //         url: 'tours/' + urlPath,
-    //         user: req.body.user,
-    //     });
-
-    //     try {
-    //         const addedTour = await tour.save();
-    //         res.send(addedTour);
-
-    //     } catch (error) {
-    //         let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-    //         res.status(400).send({ error: true, message: errs.join(', ') });
-    //     }
+    } catch (error) {
+        let errs = Object.keys(error.errors).map(er => error.errors[er].message);
+        res.status(400).send({ error: true, message: errs.join(', ') });
+    }
 
     // });
-
-
-
-    // const tour: ITour = new Tour({
-    //     name: req.body.name,
-    //     url: 'tours/' + urlPath,
-    //     user: req.body.user,
-    // });
-
-    // try {
-    //     const addedTour = await tour.save();
-    //     res.send(addedTour);
-
-    // } catch (error) {
-    //     let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-    //     res.status(400).send({ error: true, message: errs.join(', ') });
-    // }
-
-    // })
 
 };
 
