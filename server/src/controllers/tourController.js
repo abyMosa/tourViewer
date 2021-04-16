@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 // const { tourUploader } = require("../routes/uploadMiddleware");
 // import multer from 'multer';
-// import extract from 'extract-zip';
+// const extract = require('extract-zip');
 // import DecompressZip from 'decompress-zip';
 
 
@@ -113,6 +113,9 @@ const addTour = async (req, res) => {
             message: `Could not find a req.body.filePath ${req.body.filePath}`
         });
     }
+
+    req.connection.setTimeout(300000); //300 seconds
+
 
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
