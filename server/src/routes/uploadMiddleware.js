@@ -1,10 +1,9 @@
 const multer = require('multer');
 const path = require('path');
+const rootDir = require('../helpers/path');
 const fs = require('fs');
 
 const setUploadFolder = () => {
-    console.log('process.env.uploadPath', process.env.uploadPath);
-    console.log('process.env.toursPublicPath', process.env.toursPublicPath);
 
     if (!fs.existsSync(process.env.uploadPath)) {
         fs.mkdirSync(process.env.uploadPath);
@@ -21,11 +20,11 @@ const setUploadFolder = () => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.uploadPath + '/');
+        cb(null, process.env.uploadPath);
     },
     filename: (req, file, cb) => {
-
-        const filePath = path.join(process.env.uploadPath, file.originalname);
+        const pathToUpload = path.resolve(rootDir, process.env.uploadPath);
+        const filePath = path.join(pathToUpload, file.originalname);
         req.body.filePath = filePath;
         cb(null, file.originalname);
     },
