@@ -3,6 +3,7 @@ const User = require("../models/User");
 const mongoose = require('mongoose');
 const decompress = require('decompress');
 const path = require("path");
+const rootDir = require('../helpers/path');
 const fs = require("fs");
 // const { tourUploader } = require("../routes/uploadMiddleware");
 // import multer from 'multer';
@@ -116,7 +117,6 @@ const addTour = async (req, res) => {
 
     req.connection.setTimeout(300000); //300 seconds
 
-
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
     try {
@@ -170,7 +170,9 @@ const getStoragePaths = (p, id) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = [process.env.toursPublicPath, urlPath].join('/');
+    const unzipPath = path.resolve(rootDir, process.env.toursPublicPath, timeStamp, folderName);
+    console.log(unzipPath);
+
     return { unzipPath, urlPath }
 }
 
