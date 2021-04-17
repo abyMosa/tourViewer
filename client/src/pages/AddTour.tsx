@@ -5,11 +5,8 @@ import { useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { ApplicationState } from '../store/reducers';
 import { api, axiosErr } from "../axios";
-import axios from 'axios';
 import { EventType } from "../types/types";
 import ProgressBar from '../components/ProgressBar';
-import path from "path";
-import { spawn } from 'node:child_process';
 
 
 enum FormField {

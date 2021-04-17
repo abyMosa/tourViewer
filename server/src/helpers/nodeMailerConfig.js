@@ -3,8 +3,6 @@ const Mail = require('nodemailer/lib/mailer');
 const { google } = require('googleapis');
 
 
-
-
 const CLIENT_ID = '202071851685-lv1se82i6tjhll78emotbk5ln58l58sp.apps.googleusercontent.com';
 const CLIENT_SECRET = 'o34r_tWTFVMd8ghUCOfMR9NH';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
@@ -53,15 +51,6 @@ const sendResetLinkEmail = async (user, link) => {
             <p>Please, click the link below to reset your password</p>
             <p><a href='${link}'>Reset Passwork</a></p>
         `
-        // cb: (err, info) => {
-        //     if (err) {
-        //         console.log(err);
-        //         return new Promise(resolve => resolve(err));
-        //     } else {
-        //         // console.log(info);
-        //         return new Promise(resolve => resolve(info));
-        //     }
-        // }
     });
 }
 
@@ -70,15 +59,6 @@ const sendPasswordResetSuccessfulEmail = (user) => {
         to: user.email,
         subject: "Reset Password Successfull",
         html: `<p>Hi ${user.firstName},</p> <p>Your password has been reset successfully.</p> `,
-        // cb: (err, info) => {
-        //     if (err) {
-        //         console.log(err);
-        //         return new Promise(resolve => resolve(err));
-        //     } else {
-        //         return new Promise(resolve => resolve(info));
-        //         // console.log(info);
-        //     }
-        // }
     });
 }
 

@@ -9,6 +9,7 @@ import { LocationState, UserLoginFormData } from "../types/types";
 
 
 const Login: FunctionComponent = () => {
+    let registrationAllowed = false;
     let location = useLocation();
     let locationState: LocationState = location.state as LocationState || { from: { pathname: "/user" } };
 
@@ -46,7 +47,7 @@ const Login: FunctionComponent = () => {
                         btnSize="lg"
                     />
                     <p className="ta-center mt-5">Forgot password <Link to='/resetpassword'>Click here</Link></p>
-                    <p className="ta-center mt-4">Dont have an account, why not  <Link to='/register'>register</Link></p>
+                    {registrationAllowed && <p className="ta-center mt-4">Dont have an account, why not  <Link to='/register'>register</Link></p>}
 
                 </Col>
             </Row>

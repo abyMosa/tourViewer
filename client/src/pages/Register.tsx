@@ -14,6 +14,8 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [showSnackbar, setShowSnackbar] = useState(false);
+    const registrationAllowed = false;
+
 
     let defaultForm: UserRegistrationFormData = { title: "", firstName: '', lastName: '', email: '', password: '' };
 
@@ -61,7 +63,8 @@ const Register = () => {
     }
 
     return (
-        isAuthenticated ? <Redirect to={locationState.from.pathname} /> :
+        isAuthenticated || !registrationAllowed ? <Redirect to={locationState.from.pathname} /> :
+            // registrationAllowed ? <Redirect to={'/'} /> :
             <Row className="mt-6" >
                 <Col md4 mdOffset4>
                     <h1>Register</h1>
