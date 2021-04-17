@@ -1,24 +1,40 @@
 const { createTransport } = require('nodemailer');
 const Mail = require('nodemailer/lib/mailer');
+const { google } = require('googleapis');
 
 
-const transport = createTransport({
-    host: 'smtp.ionos.co.uk',
-    port: 587,
-    auth: {
-        user: 'info@inspirepress.co.uk',
-        pass: 'Abdelrhman0'
-    }
-});
+
+
+const CLIENT_ID = '202071851685-lv1se82i6tjhll78emotbk5ln58l58sp.apps.googleusercontent.com';
+const CLIENT_SECRET = 'o34r_tWTFVMd8ghUCOfMR9NH';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//047Hh6mvHQ8MMCgYIARAAGAQSNwF-L9Ir9fTHApsnplPMTEIUVX2JZ8fpFWyq-Up9T4dzsQ1wkVidPHzwCvaKlchcBarGf9iWD_Q';
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
 
 const sendEmail = async (mailArgs) => {
-    const message = {
-        from: 'info@inspirepress.co.uk',
-        ...mailArgs
-    }
-
-    // transport.sendMail(message, (err, info) => new Promise (resolve => resolve(mailArgs.cb(err, info))));
     try {
+        const accessToken = await oAuth2Client.getAccessToken();
+        const transport = createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: 'abymosa.badr@gmail.com',
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                refreshToken: REFRESH_TOKEN,
+                accessToken: accessToken,
+
+            }
+        });
+
+        const message = {
+            from: 'RowiLab Viewer <abymosa.badr@gmail.com>',
+            ...mailArgs
+        }
+
         const info = await transport.sendMail(message);
         return new Promise(resolve => resolve(info));
     } catch (error) {
@@ -67,7 +83,6 @@ const sendPasswordResetSuccessfulEmail = (user) => {
 }
 
 
-module.exports.transport = transport;
 module.exports.sendEmail = sendEmail;
 module.exports.sendResetLinkEmail = sendResetLinkEmail;
 module.exports.sendPasswordResetSuccessfulEmail = sendPasswordResetSuccessfulEmail;
