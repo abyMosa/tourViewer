@@ -74,7 +74,7 @@ const register = async (req, res) => {
     if (error) return res.status(400).send({ error: true, message: error.details[0].message });
 
     // check if user exist 
-    const emailExist = await User.findOne({ email: req.body.email });
+    const emailExist = await User.findOne({ email: req.body.email.toLowerCase() });
     if (emailExist) return res.status(400).send({ error: true, message: "User Exist" });
 
     // hash password
@@ -89,7 +89,7 @@ const register = async (req, res) => {
         title: req.body.title,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),
         role: users.length === 0 || admins.length === 0 ? 'Admin' : 'Regular',
         password: hashedPassword
     });
@@ -113,7 +113,7 @@ const login = async (req, res) => {
     if (error) return res.status(400).send({ error: true, message: error.details[0].message });
 
     // check if user exist 
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email.toLowerCase() });
     if (!user) return res.status(400).send({ error: true, message: "User doesn't Exist" });
 
     const validPassword = await bcrypt.compare(req.body.password, user.password);
