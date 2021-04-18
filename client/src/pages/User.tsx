@@ -145,12 +145,12 @@ const User = () => {
                                                         className="df f-aa-center pointer"
                                                         title="Copy to Clipboard"
                                                         onClick={() => {
-                                                            navigator.clipboard.writeText(getTourUrl(t.url));
+                                                            navigator.clipboard.writeText(getTourViewerLink(t.url));
                                                             setShowSnackbar(true);
                                                         }}
                                                     >
                                                         <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
-                                                        <p className="ml-2" > {getTourUrl(t.url)} </p>
+                                                        <p className="ml-2" > {getTourViewerLink(t.url)} </p>
                                                     </div>
                                                     <div>
 

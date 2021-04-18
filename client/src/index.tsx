@@ -5,7 +5,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-// import jwt from 'jsonwebtoken';
 
 import ScrollToTop from './components/ScrollToTop';
 import DocumentTitle from './components/DocumentTitle';
@@ -19,8 +18,6 @@ if (localStorage.jwtToken) {
   let token = localStorage.jwtToken;
   setAuthHeader(token);
   let user = getUser(token);
-  // let { exp } = jwt.decode(token) as any;
-  // store.dispatch(authSuccess(token, user, exp));
   store.dispatch(authSuccess(token, user));
 }
 
@@ -40,7 +37,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
