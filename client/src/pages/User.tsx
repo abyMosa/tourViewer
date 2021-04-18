@@ -7,12 +7,16 @@ import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Tour } from "../types/types";
 import { Dispatch } from 'redux';
 
 const User = () => {
 
+    const [tourNameText, setTourNameText] = useState('');
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isEditingTour, setIsEditingTour] = useState(false);
+    const [tourToEdit, setTourToEdit] = useState<Tour | null>(null);
 
     const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -70,6 +74,31 @@ const User = () => {
         }));
     }
 
+    const submitNameChange = (tour: Tour, tourNameText: string) => {
+        if (tourNameText === "") {
+            setIsEditModalOpen(false);
+            return;
+        }
+
+        setIsEditingTour(true);
+
+        api.patch(`/tour/${tour._id}`, { name: tourNameText })
+            .then(res => {
+                console.log(res);
+                setIsEditingTour(false);
+                setIsEditModalOpen(false);
+                if (user) {
+                    dispatch(fetchUserTours(api, user._id));
+                }
+
+            })
+            .catch(err => {
+                console.log(err);
+                setIsEditingTour(false);
+                setIsEditModalOpen(false);
+            });
+    }
+
     return (
         !isAuthenticated ? <Redirect to='/login' /> :
             <Container className="px-3 user-container">
@@ -99,6 +128,33 @@ const User = () => {
                         text="delete"
                         onClick={() => {
                             tourToDelete && deleteMyTour(tourToDelete);
+                        }}
+                    />
+
+                </Modal>
+
+                <Modal
+                    show={isEditModalOpen}
+                    backDropClicked={() => setIsEditModalOpen(false)}
+                >
+                    <h3 className="mt-0">Edit Tour Name!</h3>
+                    <Loader show={isEditingTour} />
+
+                    <div className="mb-4">
+                        <TextInput
+                            name="NewTourName"
+                            value={tourNameText}
+                            type="text"
+                            label="New Tour Name"
+                            errors={[]}
+                            onChange={(e: any) => setTourNameText(e.target.value)}
+                        />
+                    </div>
+
+                    <Btn text="cancel" dark className="mr-3 " onClick={() => setIsEditModalOpen(false)} />
+                    <Btn error text="save name"
+                        onClick={() => {
+                            tourToEdit && submitNameChange(tourToEdit, tourNameText);
                         }}
                     />
 
@@ -138,7 +194,18 @@ const User = () => {
                                                 <div className="tours-content__tour" key={t._id}>
                                                     <div><img alt={t.name} src={getTourImageUrl(t.url)} /></div>
                                                     <div>
-                                                        <h3 className="capitalise-fl mb-0">{t.name}</h3>
+                                                        <div className="df f-aa-center f-jc-start">
+                                                            <h3 className="capitalise-fl ma-0 mr-2">{t.name}</h3>
+                                                            <div
+                                                                className=""
+                                                                onClick={() => {
+                                                                    setTourToEdit(t);
+                                                                    setIsEditModalOpen(true);
+                                                                }}
+                                                            >
+                                                                <FontAwesomeIcon icon={faPencilAlt} size="sm" color='#555555' />
+                                                            </div>
+                                                        </div>
                                                         <p className="mb-3 mt-1 tag">Added {format_DD_MM_YYYY(new Date(t.createdAt).getTime() / 1000)}</p>
                                                     </div>
                                                     <div

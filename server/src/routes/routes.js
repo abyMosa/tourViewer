@@ -32,6 +32,7 @@ routes.get('/tours', verifyToken, tourController.getAllTours);
 routes.delete('/tour/:id', tourController.deleteTour);
 routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
+routes.patch('/tour/:id', verifyToken, tourController.updateTourName);
 
 
 module.exports = routes;

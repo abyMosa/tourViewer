@@ -202,8 +202,32 @@ const getStoragePaths = (p, id) => {
 }
 
 
+const updateTourName = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+        return res.status(400).send({ error: true, message: "Invalid tour id!" });
+
+    if (!req.body.name)
+        return res.status(400).send({ error: true, message: "Tour Name Required!" });
+
+    let tour = await Tour.findById(req.params.id);
+    if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
+
+    const updatedTour = await Tour.findOneAndUpdate(
+        { _id: tour._id },
+        { $set: { name: req.body.name } },
+    );
+
+    // let updatedTour = await User.findById(req.body.id);
+    if (!updatedTour) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
+
+    res.status(200).send(updatedTour);
+};
+
+
+
 module.exports.getTour = getTour;
 module.exports.deleteTour = deleteTour;
 module.exports.getAllTours = getAllTours;
 module.exports.getUserTours = getUserTours;
 module.exports.addTour = addTour;
+module.exports.updateTourName = updateTourName;
