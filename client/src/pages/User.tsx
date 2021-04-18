@@ -197,7 +197,7 @@ const User = () => {
                                                         <div className="df f-aa-center f-jc-start">
                                                             <h3 className="capitalise-fl ma-0 mr-2">{t.name}</h3>
                                                             <div
-                                                                className=""
+                                                                className="pointer"
                                                                 onClick={() => {
                                                                     setTourToEdit(t);
                                                                     setIsEditModalOpen(true);
