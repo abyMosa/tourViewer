@@ -163,7 +163,8 @@ const addTour = async (req, res) => {
             filter: file => {
                 // console.log(file);
                 const fileAr = file.path.split('/');
-                return fileAr[0] !== '__MACOSX';
+                // return fileAr[0] !== '__MACOSX';
+                return !fileAr.includes('__MACOSX');
             },
             strip: 1,
         });
