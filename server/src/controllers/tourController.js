@@ -159,7 +159,14 @@ const addTour = async (req, res) => {
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
     try {
-        await decompress(req.body.filePath, unzipPath);
+        await decompress(req.body.filePath, unzipPath, {
+            filter: file => {
+                // console.log(file);
+                const fileAr = file.path.split('/');
+                return fileAr[0] !== '__MACOSX';
+            },
+            strip: 1,
+        });
         fs.unlink(req.body.filePath, (err) => {
             if (err) console.log('err:: deleting the compressed file', err);
 
