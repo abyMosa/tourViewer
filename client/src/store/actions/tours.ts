@@ -145,7 +145,7 @@ export const addTour = async (axios: AxiosInstance, form: AddTourForm) => {
 // helpers 
 
 
-export const getTourViewerLink = (tourPath: string) => {
+export const getTourViewerLink = (tourPath: string, label: string) => {
     let tourFullPath = `${window.location.origin}/api/${tourPath}`;
     let url = new URL(tourFullPath);
     let urlHrefAr = url.href.split("");
@@ -157,7 +157,7 @@ export const getTourViewerLink = (tourPath: string) => {
     let tourName = UrlHrefNoNameAr.splice(UrlHrefNoNameAr.length - 1, 1);
     let urlHref = UrlHrefNoNameAr.join('/');
     const viewerPath = `${window.location.origin}/viewer/index.html`;
-    return `${viewerPath}?tour=${tourName}&content-path=${urlHref}/`;
+    return `${viewerPath}?label=${label}&tour=${tourName}&content-path=${urlHref}/`;
 }
 
 export const getTourUrl = (tourPath: string) => {

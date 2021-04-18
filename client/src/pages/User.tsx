@@ -145,18 +145,18 @@ const User = () => {
                                                         className="df f-aa-center pointer"
                                                         title="Copy to Clipboard"
                                                         onClick={() => {
-                                                            navigator.clipboard.writeText(getTourViewerLink(t.url));
+                                                            navigator.clipboard.writeText(getTourViewerLink(t.url, t.name));
                                                             setShowSnackbar(true);
                                                         }}
                                                     >
                                                         <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
-                                                        <p className="ml-2" > {getTourViewerLink(t.url)} </p>
+                                                        <p className="ml-2" > {getTourViewerLink(t.url, t.name)} </p>
                                                     </div>
                                                     <div>
 
                                                         <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
                                                         <a
-                                                            href={getTourViewerLink(t.url)}
+                                                            href={getTourViewerLink(t.url, t.name)}
                                                             target="_blank"
                                                             rel="noreferrer"
                                                             className="nodecoration"
