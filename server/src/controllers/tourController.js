@@ -161,10 +161,12 @@ const addTour = async (req, res) => {
     try {
         await decompress(req.body.filePath, unzipPath, {
             filter: file => {
-                // console.log(file);
-                const fileAr = file.path.split('/');
+                console.log(file);
+                let fileAr = file.path.split('/');
+                fileAr = file.path.split("\\");
                 // return fileAr[0] !== '__MACOSX';
-                return !fileAr.includes('__MACOSX');
+                return !fileAr.includes('__MACOSX') || !file.path.startsWith('__MACOSX');
+                // return !fileAr.includes('__MACOSX');
             },
             strip: 1,
         });

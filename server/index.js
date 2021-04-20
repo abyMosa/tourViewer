@@ -12,6 +12,9 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 setUploadFolder();
 
+
+// app.use(express.limit('4000M'));
+
 app.use('/tours', express.static(path.join(__dirname, 'public', 'tours')));
 app.use(express.static(path.join(__dirname, 'public')));
 
