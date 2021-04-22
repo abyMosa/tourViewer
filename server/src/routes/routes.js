@@ -23,9 +23,10 @@ routes.patch('/user/:id', verifyToken, userController.updateUser);
 // Tour
 routes.get('/tour/:id', tourController.getTour);
 
-// routes.post('/tour', verifyToken, tourController.addTour);
-routes.post('/tour', verifyToken, tourUploader, tourController.addTour);
+// routes.post('/tour', verifyToken, tourUploader, tourController.addTour);
+routes.post('/tour', tourUploader, tourController.addTour);
 // routes.post('/tour/s3sign', tourController.s3sign);
+
 
 routes.get('/tours', verifyToken, tourController.getAllTours);
 // routes.delete('/tour/:id', verifyToken, tourController.deleteTour);

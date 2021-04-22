@@ -5,6 +5,13 @@ const decompress = require('decompress');
 const path = require("path");
 const rootDir = require('../helpers/path');
 const fs = require("fs");
+const { unzip, unzipSync } = require('../helpers/unzip');
+// const JSZip = require('jszip');
+// const mkdir = require('mkdirp');
+// const unzip = require('unzip');
+// const StreamZip = require('node-stream-zip');
+
+
 
 
 const getTour = async (req, res) => {
@@ -158,41 +165,67 @@ const addTour = async (req, res) => {
 
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
 
-    try {
-        await decompress(req.body.filePath, unzipPath, {
-            filter: file => {
-                const fileAr = file.path.split("\\");
-                return !fileAr.includes('__MACOSX') || !file.path.startsWith('__MACOSX');
-            },
-            strip: 1,
+    // try {
+    //     await decompress(req.body.filePath, unzipPath, {
+    //         filter: file => {
+    //             const fileAr = file.path.split("\\");
+    //             return !fileAr.includes('__MACOSX') || !file.path.startsWith('__MACOSX');
+    //         },
+    //         strip: 1,
+    //     });
+    //     fs.unlink(req.body.filePath, (err) => {
+    //         if (err) console.log('err:: deleting the compressed file', err);
+
+    //         console.log('zip file deleted');
+    //     })
+
+    // } catch (error) {
+    //     console.log(error);
+    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error, filePath: req.body.filePath });
+    // }
+
+    unzip(req.body.filePath, unzipPath, async ({ error, err }) => {
+        if (error)
+            res.status(400).send({ error: true, message: 'error unzipping tour', err: err });
+
+        fs.unlinkSync(req.body.filePath);
+        console.log('zip file deleted');
+
+
+        const tour = new Tour({
+            name: req.body.name,
+            url: 'tours/' + urlPath,
+            user: req.body.user,
         });
-        fs.unlink(req.body.filePath, (err) => {
-            if (err) console.log('err:: deleting the compressed file', err);
 
-            console.log('zip file deleted');
-        })
+        try {
+            const addedTour = await tour.save();
+            res.send(addedTour);
 
-    } catch (error) {
-        console.log(error);
-        return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error, filePath: req.body.filePath });
-    }
-
-    const tour = new Tour({
-        name: req.body.name,
-        url: 'tours/' + urlPath,
-        user: req.body.user,
+        } catch (error) {
+            let errs = Object.keys(error.errors).map(er => error.errors[er].message);
+            res.status(400).send({ error: true, message: errs.join(', ') });
+        }
     });
 
-    try {
-        const addedTour = await tour.save();
-        res.send(addedTour);
+    // try {
+    //     await unzip(req.body.filePath, unzipPath);
+    //     fs.unlink(req.body.filePath, (err) => {
+    //         if (err) console.log('err:: deleting the compressed file', err);
 
-    } catch (error) {
-        let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-        res.status(400).send({ error: true, message: errs.join(', ') });
-    }
+    //         console.log('zip file deleted');
+    //     })
+    // } catch (error) {
+    //     console.log(error);
+    //     return res.status(400).send({
+    //         error: true,
+    //         message: "error unzipping the tour, is it a zip file?",
+    //         errorObj: error,
+    //         filePath: req.body.filePath
+    //     });
+    // }
 
-    // });
+
 
 };
 
@@ -201,7 +234,7 @@ const getStoragePaths = (p, id) => {
     let folderName = path.basename(p, '.zip');
     let timeStamp = Date.now().toString();
     const urlPath = [id, timeStamp, folderName].join('/');
-    const unzipPath = path.resolve(rootDir, process.env.toursPublicPath, urlPath);
+    const unzipPath = path.resolve(rootDir, process.env.toursPublicPath, id.toString(), timeStamp);
     console.log(unzipPath);
 
     return { unzipPath, urlPath }
@@ -223,12 +256,10 @@ const updateTourName = async (req, res) => {
         { $set: { name: req.body.name } },
     );
 
-    // let updatedTour = await User.findById(req.body.id);
     if (!updatedTour) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
 
     res.status(200).send(updatedTour);
 };
-
 
 
 module.exports.getTour = getTour;

@@ -121,6 +121,18 @@ const AddTour = () => {
 
     }
 
+    const formatBytes = (bytes: number, decimals: number = 2) => {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
     const formatLog = (event: (EventType | null), text: string): JSX.Element => {
         return (
             <div className="df f-jc-start f-aa-center">
@@ -150,7 +162,7 @@ const AddTour = () => {
                 return (
                     <div>
                         {formatLog(event, 'Uploading Tour')}
-                        {formatLog(null, `Large file, pleasse be patient (${progress[0]} - ${progress[1]})`)}
+                        {formatLog(null, `Large file, please be patient (${formatBytes(progress[0])} - ${formatBytes(progress[1])})`)}
                         {addTourForm.tourFile &&
                             <div className="df">
                                 <div style={{ width: "38px" }}></div>
