@@ -10,7 +10,7 @@ const app = express();
 const port = 5000;
 
 app.set('view engine', 'ejs');
-app.set('views', 'src/views');
+app.set('views', './src/views');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 setUploadFolder();
