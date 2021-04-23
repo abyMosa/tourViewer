@@ -37,12 +37,12 @@ routes.patch('/tour/:id', verifyToken, tourController.updateTourName);
 
 
 routes.get('/viewer', (req, res) => {
-    console.log('location', req.query);
+    console.log('location', req.query['content-path']);
     let { label, tour } = req.query;
     let contentPath = req.query['content-path'];
     let imageUrl = [contentPath + "" + tour, 'preview.jpg'].join('/');
     let title = label || tour;
-    let pageTitle = title + " | RowiLAB Viewer"
+    let pageTitle = `${title} | RowiLAB Viewer`;
 
     res.status(200).render('viewer', { label: pageTitle, imageUrl });
 });
