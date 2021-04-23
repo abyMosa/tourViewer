@@ -40,7 +40,7 @@ routes.get('/viewer', (req, res) => {
     // console.log('location', req.query);
     let { label, tour } = req.query;
     let contentPath = req.query['content-path'];
-    let imageUrl = [contentPath, tour, 'preview.jpg'].join('/');
+    let imageUrl = [contentPath + tour, 'preview.jpg'].join('/');
 
     res.status(200).render('viewer', { pageTitle: 'some title', title: label, imageUrl });
 });
