@@ -36,4 +36,14 @@ routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 routes.patch('/tour/:id', verifyToken, tourController.updateTourName);
 
 
+routes.get('/viewer', (req, res) => {
+    // console.log('location', req.query);
+    let { label, tour } = req.query;
+    let contentPath = req.query['content-path'];
+    let imageUrl = [contentPath, tour, 'preview.jpg'].join('/');
+
+    res.status(200).render('viewer', { pageTitle: 'some title', title: label, imageUrl });
+});
+
+
 module.exports = routes;

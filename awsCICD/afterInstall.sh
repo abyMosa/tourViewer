@@ -3,7 +3,7 @@
 # sudo printf '%s\n%s\n%s\n%s\n' 'Options -MultiViews' 'RewriteEngine On' 'RewriteCond %{REQUEST_FILENAME} !-f' 'RewriteRule ^ index.html [QSA,L]'  'RewriteEngine On'  'RewriteCond %{HTTPS} off' 'RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]'  >> /var/www/rowilab/.htaccess
 # sudo printf '%s\n%s\n%s\n%s\n' 'Options -MultiViews' 'RewriteEngine On' 'RewriteCond %{REQUEST_FILENAME} !-f' 'RewriteRule ^ index.html [QSA,L]'  'RewriteEngine On'  'RewriteCond %{HTTPS} off' 'RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]'  >> /var/www/rowilabViewer/.htaccess
 sudo chown -R ubuntu:ubuntu /var/www/rowilab
-sudo chown -R ubuntu:ubuntu /var/www/rowilabViewer
+# sudo chown -R ubuntu:ubuntu /var/www/rowilabViewer
 # cd /var/www/rowilab/server && npm install
 # cd /var/www/rowilab/server && ls -al
 # cd /var/www/rowilab/server && tsc

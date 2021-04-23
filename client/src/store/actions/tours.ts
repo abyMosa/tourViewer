@@ -156,7 +156,7 @@ export const getTourViewerLink = (tourPath: string, label: string) => {
     let UrlHrefNoNameAr = urlHrefAr.join('').split('/');
     let tourName = UrlHrefNoNameAr.splice(UrlHrefNoNameAr.length - 1, 1);
     let urlHref = UrlHrefNoNameAr.join('/');
-    const viewerPath = `${window.location.origin}/viewer/index.html`;
+    const viewerPath = `${window.location.origin}/api/viewer`;
     return `${viewerPath}?label=${label}&tour=${tourName}&content-path=${urlHref}/`;
 }
 

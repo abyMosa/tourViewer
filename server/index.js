@@ -8,12 +8,15 @@ const { setUploadFolder } = require('./src/routes/uploadMiddleware');
 
 const app = express();
 const port = 5000;
-dotenv.config({ path: path.join(__dirname, '.env') });
 
+app.set('view engine', 'ejs');
+app.set('views', 'src/views');
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 setUploadFolder();
 
 
-// app.use(express.limit('4000M'));
+
 
 app.use('/tours', express.static(path.join(__dirname, 'public', 'tours')));
 app.use(express.static(path.join(__dirname, 'public')));
