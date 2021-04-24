@@ -37,6 +37,7 @@ export interface UserLoginFormData {
 export interface Tour {
     _id: string;
     name: string;
+    description: string;
     image: string;
     url: string;
     user: string;

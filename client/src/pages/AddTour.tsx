@@ -11,11 +11,13 @@ import ProgressBar from '../components/ProgressBar';
 
 enum FormField {
     name,
+    description,
     tour,
 }
 
 interface AddTourForm {
     name: string;
+    description: string;
     tourFile: (File | null);
 }
 
@@ -28,7 +30,7 @@ const AddTour = () => {
     const { isAuthenticated, user } = useSelector((state: ApplicationState) => state.auth);
     const { isAddingTour } = useSelector((state: ApplicationState) => state.tours);
 
-    const defaultForm: AddTourForm = { name: '', tourFile: null }
+    const defaultForm: AddTourForm = { name: '', description: '', tourFile: null }
     const [addTourForm, setAddTourForm] = useState(defaultForm);
 
     const [isFormValid, setIsFormValid] = useState(false);
@@ -38,7 +40,7 @@ const AddTour = () => {
     const [events, setEvents] = useState<EventType[]>([]);
 
     const validateForm = (form: AddTourForm): void => {
-        let isValid = (form.name !== '' && form.tourFile) ? true : false;
+        let isValid = (form.tourFile) ? true : false;
         setIsFormValid(isValid);
     }
 
@@ -47,6 +49,11 @@ const AddTour = () => {
             case FormField.name:
                 setAddTourForm({ ...addTourForm, name: e.target.value })
                 validateForm({ ...addTourForm, name: e.target.value })
+                break;
+
+            case FormField.description:
+                setAddTourForm({ ...addTourForm, description: e.target.value })
+                validateForm({ ...addTourForm, description: e.target.value })
                 break;
 
             case FormField.tour:
@@ -96,6 +103,7 @@ const AddTour = () => {
             var bodyFormData = new FormData();
             bodyFormData.append('tour', addTourForm.tourFile);
             bodyFormData.append('name', addTourForm.name);
+            bodyFormData.append('description', addTourForm.description);
             bodyFormData.append('user', user._id);
 
             api.post('/tour', bodyFormData, options)
@@ -218,6 +226,18 @@ const AddTour = () => {
                                 errors={[]}
 
                                 onChange={(e: any) => onChange(FormField.name, e)}
+                            />
+
+                            <br />
+                            <br />
+
+                            <TextInput
+                                name="name"
+                                value={addTourForm.description}
+                                type="textarea"
+                                label="description"
+                                errors={[]}
+                                onChange={(e: any) => onChange(FormField.description, e)}
                             />
 
                             <h4 className="mt-5 capitalise">Upload Tour File</h4>

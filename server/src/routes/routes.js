@@ -2,7 +2,7 @@ const { Router } = require('express');
 const userController = require("../controllers/userController");
 const tourController = require("../controllers/tourController");
 const { verifyToken } = require('../helpers/verifyToken');
-const { tourUploader } = require('./uploadMiddleware');
+const { tourUploader, previewImageUploader } = require('./uploadMiddleware');
 
 const routes = Router();
 
@@ -28,16 +28,20 @@ routes.post('/tour', tourUploader, tourController.addTour);
 // routes.post('/tour/s3sign', tourController.s3sign);
 
 
+
+
 routes.get('/tours', verifyToken, tourController.getAllTours);
-// routes.delete('/tour/:id', verifyToken, tourController.deleteTour);
-routes.delete('/tour/:id', tourController.deleteTour);
+routes.delete('/tour/:id', verifyToken, tourController.deleteTour);
+// routes.delete('/tour/:id', tourController.deleteTour);
+
+// routes.get('/user/:id/tours', tourController.getUserTours);
 routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
-routes.patch('/tour/:id', verifyToken, tourController.updateTourName);
+routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
+// routes.patch('/tour/:id', previewImageUploader, tourController.updateTour);
 
 
 routes.get('/viewer', (req, res) => {
-    console.log('location', req.query['content-path']);
     let { label, tour } = req.query;
     let contentPath = req.query['content-path'];
     let imageUrl = [contentPath + "" + tour, 'preview.jpg'].join('/');

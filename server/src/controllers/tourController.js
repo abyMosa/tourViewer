@@ -137,7 +137,6 @@ const getUserTours = async (req, res) => {
 
 
 const addTour = async (req, res) => {
-    // tourUploader(req, res, async (err) => {
 
     if (!req.body.user)
         return res.status(400).send({ error: true, message: "user is required!" });
@@ -161,28 +160,7 @@ const addTour = async (req, res) => {
         });
     }
 
-    req.connection.setTimeout(300000); //300 seconds
-
     const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
-
-    // try {
-    //     await decompress(req.body.filePath, unzipPath, {
-    //         filter: file => {
-    //             const fileAr = file.path.split("\\");
-    //             return !fileAr.includes('__MACOSX') || !file.path.startsWith('__MACOSX');
-    //         },
-    //         strip: 1,
-    //     });
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-
-    // } catch (error) {
-    //     console.log(error);
-    //     return res.status(400).send({ error: true, message: "error unzipping the tour, is it a zip file?", errorObj: error, filePath: req.body.filePath });
-    // }
 
     unzip(req.body.filePath, unzipPath, async ({ error, err }) => {
         if (error)
@@ -191,9 +169,11 @@ const addTour = async (req, res) => {
         fs.unlinkSync(req.body.filePath);
         console.log('zip file deleted');
 
+        let folderName = path.basename(req.body.filePath, '.zip');
 
         const tour = new Tour({
-            name: req.body.name,
+            name: req.body.name !== '' ? req.body.name : folderName,
+            description: req.body.description,
             url: 'tours/' + urlPath,
             user: req.body.user,
         });
@@ -207,25 +187,6 @@ const addTour = async (req, res) => {
             res.status(400).send({ error: true, message: errs.join(', ') });
         }
     });
-
-    // try {
-    //     await unzip(req.body.filePath, unzipPath);
-    //     fs.unlink(req.body.filePath, (err) => {
-    //         if (err) console.log('err:: deleting the compressed file', err);
-
-    //         console.log('zip file deleted');
-    //     })
-    // } catch (error) {
-    //     console.log(error);
-    //     return res.status(400).send({
-    //         error: true,
-    //         message: "error unzipping the tour, is it a zip file?",
-    //         errorObj: error,
-    //         filePath: req.body.filePath
-    //     });
-    // }
-
-
 
 };
 
@@ -241,19 +202,48 @@ const getStoragePaths = (p, id) => {
 }
 
 
-const updateTourName = async (req, res) => {
+const updateTour = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid tour id!" });
 
     if (!req.body.name)
         return res.status(400).send({ error: true, message: "Tour Name Required!" });
 
+    if (!req.body.description)
+        return res.status(400).send({ error: true, message: "Tour Description Required!" });
+
     let tour = await Tour.findById(req.params.id);
     if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
 
+    console.log('req.file', req.file);
+
+    // if there is a previewImage file then 
+    if (req.file) {
+
+        let tourPath = path.join(rootDir, 'public', tour.url);
+        let previewLocation = path.join(tourPath, 'preview.jpg');
+        let writeLocation = path.join(tourPath, 'preview-temp.jpg');
+
+        fs.writeFile(writeLocation, req.file.buffer, 'binary', (e) => {
+            if (e) {
+                console.error(e);
+                return res.status(400).send({ error: true, err: e, message: 'error writing buffer' });
+            }
+
+            fs.unlinkSync(previewLocation);
+            fs.rename(writeLocation, previewLocation, err => {
+                if (err) {
+                    console.error(err);
+                    return res.status(400).send({ error: true, err, message: 'error renaming' });
+                }
+            })
+
+        });
+    }
+
     const updatedTour = await Tour.findOneAndUpdate(
         { _id: tour._id },
-        { $set: { name: req.body.name } },
+        { $set: { name: req.body.name, description: req.body.description } },
     );
 
     if (!updatedTour) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
@@ -267,4 +257,4 @@ module.exports.deleteTour = deleteTour;
 module.exports.getAllTours = getAllTours;
 module.exports.getUserTours = getUserTours;
 module.exports.addTour = addTour;
-module.exports.updateTourName = updateTourName;
+module.exports.updateTour = updateTour;

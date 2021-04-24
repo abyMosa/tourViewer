@@ -11,12 +11,33 @@ import { faCopy, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Tour } from "../types/types";
 import { Dispatch } from 'redux';
 
+
+
+interface EditTourForm {
+    name: string;
+    description: string;
+    previewImage: (File | null);
+}
+
+
+interface EditingTour {
+    isModalOpen: boolean;
+    loading: boolean;
+    tour: Tour | null;
+}
+
+
 const User = () => {
 
-    const [tourNameText, setTourNameText] = useState('');
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isEditingTour, setIsEditingTour] = useState(false);
-    const [tourToEdit, setTourToEdit] = useState<Tour | null>(null);
+
+    // const [tourEdit, setTourEdit] = useState<EditingTour | NotEditingTour>({ state: EditingState.NotEditing });
+
+    const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null }
+    const [editTourForm, setEditTourForm] = useState(defaultTourEditData);
+
+    const defaultEditState: EditingTour = { isModalOpen: false, loading: false, tour: null }
+    const [editingState, setEditingState] = useState<EditingTour>(defaultEditState);
+
 
     const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -38,6 +59,23 @@ const User = () => {
     const filteredToures = userTours.filter(t => t.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1);
     const filterButNoResult = filteredToures.length === 0 && filterText !== '';
     const toursToDisplay = (filteredToures.length !== 0 || filterButNoResult) ? filteredToures : userTours;
+
+
+
+    const closeEditModal = () => {
+        setEditingState(s => ({ ...s, isModalOpen: false }));
+        setEditTourForm(defaultTourEditData)
+    }
+
+    const openEditModal = (tour: Tour) => {
+        setEditingState(s => ({ ...s, isModalOpen: true, tour }));
+        setEditTourForm({
+            name: tour.name,
+            description: tour.description,
+            previewImage: null,
+        })
+    }
+
 
     const showDeleteModal = (tour: Tour) => {
         setTourToDelete(tour);
@@ -74,28 +112,41 @@ const User = () => {
         }));
     }
 
-    const submitNameChange = (tour: Tour, tourNameText: string) => {
-        if (tourNameText === "") {
-            setIsEditModalOpen(false);
+
+
+    const submitEditForm = (tour: Tour) => {
+        if (editTourForm.name === "" && editTourForm.description === '' && !editTourForm.previewImage) {
+            closeEditModal();
             return;
         }
 
-        setIsEditingTour(true);
+        setEditingState(s => ({ ...s, loading: true }));
 
-        api.patch(`/tour/${tour._id}`, { name: tourNameText })
+
+        var options = {
+            headers: { 'Content-Type': "multipart/form-data" }
+        };
+
+        var bodyFormData = new FormData();
+        bodyFormData.append('name', editTourForm.name);
+        bodyFormData.append('description', editTourForm.description);
+        if (editTourForm.previewImage) {
+            bodyFormData.append('previewImage', editTourForm.previewImage);
+        }
+
+        api.patch(`/tour/${tour._id}`, bodyFormData, options)
             .then(res => {
                 console.log(res);
-                setIsEditingTour(false);
-                setIsEditModalOpen(false);
                 if (user) {
                     dispatch(fetchUserTours(api, user._id));
                 }
+                closeEditModal();
+                window.location.reload(false);
 
             })
             .catch(err => {
                 console.log(err);
-                setIsEditingTour(false);
-                setIsEditModalOpen(false);
+                closeEditModal();
             });
     }
 
@@ -134,29 +185,51 @@ const User = () => {
                 </Modal>
 
                 <Modal
-                    show={isEditModalOpen}
-                    backDropClicked={() => setIsEditModalOpen(false)}
+                    show={editingState.isModalOpen}
+                    backDropClicked={() => closeEditModal()}
+                    className="edit-tour-modal"
                 >
-                    <h3 className="mt-0">Edit Tour Name!</h3>
-                    <Loader show={isEditingTour} />
+                    <h3 className="mt-0">Edit Tour</h3>
+                    <Loader show={editingState.loading} />
 
                     <div className="mb-4">
                         <TextInput
-                            name="NewTourName"
-                            value={tourNameText}
+                            name="name"
+                            value={editTourForm.name}
                             type="text"
-                            label="New Tour Name"
+                            label="Name"
                             errors={[]}
-                            onChange={(e: any) => setTourNameText(e.target.value)}
+                            onChange={(e: any) => setEditTourForm(f => ({ ...f, name: e.target.value }))}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <TextInput
+                            name="description"
+                            value={editTourForm.description}
+                            type="textarea"
+                            label="Description"
+                            errors={[]}
+                            onChange={(e: any) => setEditTourForm(f => ({ ...f, description: e.target.value }))}
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <h4>Replace Preview Image</h4>
+                        <input
+                            type="file"
+                            disabled={editingState.loading}
+                            onChange={(e: any) => setEditTourForm(f => ({ ...f, previewImage: e.target.files[0] }))}
+                            accept=".jpg"
                         />
                     </div>
 
-                    <Btn text="cancel" dark className="mr-3 " onClick={() => setIsEditModalOpen(false)} />
-                    <Btn error text="save name"
-                        onClick={() => {
-                            tourToEdit && submitNameChange(tourToEdit, tourNameText);
-                        }}
-                    />
+                    <div className="df f-jc-end">
+                        <Btn text="cancel" dark className="mr-3 " onClick={() => closeEditModal()} />
+                        <Btn error text="update tour"
+                            onClick={() => {
+                                editingState.tour && submitEditForm(editingState.tour);
+                            }}
+                        />
+                    </div>
 
                 </Modal>
 
@@ -196,31 +269,34 @@ const User = () => {
                                                     <div>
                                                         <div className="df f-aa-center f-jc-start">
                                                             <h3 className="capitalise-fl ma-0 mr-2">{t.name}</h3>
-                                                            <div
+                                                            {/* <div
                                                                 className="pointer"
                                                                 onClick={() => {
-                                                                    setTourToEdit(t);
-                                                                    setIsEditModalOpen(true);
+                                                                    openEditModal(t)
                                                                 }}
                                                             >
                                                                 <FontAwesomeIcon icon={faPencilAlt} size="sm" color='#555555' />
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                         <p className="mb-3 mt-1 tag">Added {format_DD_MM_YYYY(new Date(t.createdAt).getTime() / 1000)}</p>
-                                                    </div>
-                                                    <div
-                                                        className="df f-aa-center pointer"
-                                                        title="Copy to Clipboard"
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText(getTourViewerLink(t.url, t.name));
-                                                            setShowSnackbar(true);
-                                                        }}
-                                                    >
-                                                        <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
-                                                        <p className="ml-2" > {getTourViewerLink(t.url, t.name)} </p>
+                                                        <p>{t.description}</p>
+                                                        <div
+                                                            className="code-wrapper"
+                                                            title="Copy to Clipboard"
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(getTourViewerLink(t.url, t.name));
+                                                                setShowSnackbar(true);
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
+                                                            <div className="ml-2">
+                                                                <code> {getTourViewerLink(t.url, t.name)} </code>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <div>
 
+                                                        <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
                                                         <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
                                                         <a
                                                             href={getTourViewerLink(t.url, t.name)}

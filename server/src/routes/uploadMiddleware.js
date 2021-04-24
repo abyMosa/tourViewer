@@ -45,5 +45,16 @@ const upload = multer({
     }
 });
 
+
+const previewImageStorage = multer.memoryStorage();
+const previewImageUploader = multer({
+    storage: previewImageStorage,
+    fileFilter: (req, file, cb) => {
+        cb(null, path.extname(file.originalname) === '.jpg');
+    }
+});
+
 module.exports.tourUploader = upload.single('tour');
+module.exports.previewImageUploader = previewImageUploader.single('previewImage');
+
 module.exports.setUploadFolder = setUploadFolder;
