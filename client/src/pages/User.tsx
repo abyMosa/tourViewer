@@ -72,7 +72,7 @@ const User = () => {
         setEditingState(s => ({ ...s, isModalOpen: true, tour }));
         setEditTourForm({
             name: tour.name,
-            description: tour.description,
+            description: tour.description || '',
             previewImage: null,
         })
     }
