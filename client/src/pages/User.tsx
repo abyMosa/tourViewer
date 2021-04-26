@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal } from '@abymosa/ipsg';
+import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal, Switch } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { fetchUserTours, getTourViewerLink, getTourUrl, getTourImageUrl, deleteTour } from "../store/actions";
+import { fetchUserTours, getTourViewerLink, getTourImageUrl, deleteTour } from "../store/actions";
 import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLink, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Tour } from "../types/types";
-import { Dispatch } from 'redux';
-
-
+import PaginatedContent from '../components/PaginatedContent';
+import cn from 'classnames';
 
 interface EditTourForm {
     name: string;
@@ -26,11 +25,12 @@ interface EditingTour {
     tour: Tour | null;
 }
 
+enum ViewType {
+    ListView,
+    DigestView
+}
 
 const User = () => {
-
-
-    // const [tourEdit, setTourEdit] = useState<EditingTour | NotEditingTour>({ state: EditingState.NotEditing });
 
     const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null }
     const [editTourForm, setEditTourForm] = useState(defaultTourEditData);
@@ -38,6 +38,7 @@ const User = () => {
     const defaultEditState: EditingTour = { isModalOpen: false, loading: false, tour: null }
     const [editingState, setEditingState] = useState<EditingTour>(defaultEditState);
 
+    const [viewType, setViewType] = useState<ViewType>(ViewType.ListView);
 
     const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -238,84 +239,117 @@ const User = () => {
                     <Col md12>
                         <div className="df f-aa-end f-jc-sb user-container__tours-header">
                             <div>
-                                <p className="my-0  text-sm">{userTours?.length} found</p>
+                                <div className="df f-aa-center">
+                                    <p className="mb-0 mt-3 mr-3 text-sm">{userTours?.length} found</p>
+                                    <Switch onChange={(e: any) => setViewType(e.target.checked ? ViewType.DigestView : ViewType.ListView)} />
+                                </div>
                                 <div className="df f-aa-center">
                                     <HeadLine title="Tours" />
                                     <Link to='user/addtour'><Btn className="ml-3" text="Add New" sm /></Link>
                                 </div>
                             </div>
-                            <TextInput
-                                name="search"
-                                value={filterText}
-                                type="text"
-                                label="Filter tours by name"
-                                errors={[]}
-                                onChange={(e: any) => setFilterText(e.target.value)}
-                            />
+
+                            <div>
+                                <div>
+                                    <TextInput
+                                        name="search"
+                                        value={filterText}
+                                        type="text"
+                                        label="Filter tours by name"
+                                        errors={[]}
+                                        onChange={(e: any) => setFilterText(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
                         </div>
 
                         <Loader show={loadingUserTours} />
 
-                        <div className="tours-content">
+                        <div className={cn("tours-content", viewType === ViewType.DigestView && "tours-content--digest")} >
                             {
                                 userTours.length === 0
                                     ? <p>No tours to display. maybe add a new tour <Link to='user/addtour'>here</Link></p>
                                     : filterButNoResult
                                         ? <p>Couldnt find tours that match your filter query.</p>
-                                        : toursToDisplay.map(t => {
-                                            return (
-                                                <div className="tours-content__tour" key={t._id}>
-                                                    <div><img alt={t.name} src={getTourImageUrl(t.url)} /></div>
-                                                    <div>
-                                                        <div className="df f-aa-center f-jc-start">
-                                                            <h3 className="capitalise-fl ma-0 mr-2">{t.name}</h3>
-                                                            {/* <div
-                                                                className="pointer"
+                                        : <PaginatedContent
+                                            loading={false}
+                                            className=""
+                                            pageLimit={12}
+                                            data={toursToDisplay}
+                                            renderRow={(t: any) => {
+
+                                                return (
+                                                    <div className="tours-content__tour" key={t._id}>
+                                                        <div className="tours-content__image"><img alt={t.name} src={getTourImageUrl(t.url)} /></div>
+                                                        <div className="tours-content__details">
+                                                            <div className="df f-aa-center f-jc-sb ma-0">
+                                                                <h3 className="capitalise-fl ma-0 ">{t.name}</h3>
+                                                                {viewType === ViewType.DigestView &&
+                                                                    <div className="df f-jc-end">
+                                                                        <FontAwesomeIcon
+                                                                            className="pointer mr-2"
+                                                                            icon={faLink}
+                                                                            color='#555555'
+                                                                            size='sm'
+                                                                            onClick={() => {
+                                                                                navigator.clipboard.writeText(getTourViewerLink(t.url, t._id));
+                                                                                setShowSnackbar(true);
+                                                                            }}
+                                                                        />
+                                                                        <FontAwesomeIcon
+                                                                            className="pointer"
+                                                                            icon={faPencilAlt}
+                                                                            color='#555555'
+                                                                            size='sm'
+                                                                            onClick={() => openEditModal(t)}
+                                                                        />
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                            <p className="mb-3 mt-1 tag"> {format_DD_MM_YYYY(new Date(t.createdAt).getTime() / 1000)}</p>
+                                                            <p className="tours-content__description">{t.description}</p>
+                                                            <div
+                                                                className="code-wrapper"
+                                                                title="Copy to Clipboard"
                                                                 onClick={() => {
-                                                                    openEditModal(t)
+                                                                    navigator.clipboard.writeText(getTourViewerLink(t.url, t._id));
+                                                                    setShowSnackbar(true);
                                                                 }}
                                                             >
-                                                                <FontAwesomeIcon icon={faPencilAlt} size="sm" color='#555555' />
-                                                            </div> */}
-                                                        </div>
-                                                        <p className="mb-3 mt-1 tag">Added {format_DD_MM_YYYY(new Date(t.createdAt).getTime() / 1000)}</p>
-                                                        <p>{t.description}</p>
-                                                        <div
-                                                            className="code-wrapper"
-                                                            title="Copy to Clipboard"
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(getTourViewerLink(t.url, t.name));
-                                                                setShowSnackbar(true);
-                                                            }}
-                                                        >
-                                                            <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
-                                                            <div className="ml-2">
-                                                                <code> {getTourViewerLink(t.url, t.name)} </code>
+                                                                <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
+                                                                <div className="ml-2">
+                                                                    <code> {getTourViewerLink(t.url, t._id)} </code>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div>
+                                                        <div className="tours-content__actions">
 
-                                                        <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
-                                                        <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
-                                                        <a
-                                                            href={getTourViewerLink(t.url, t.name)}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            className="nodecoration"
-                                                        >
-                                                            <Btn sm className="" text="open" />
-                                                        </a>
+                                                            <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
+                                                            <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
+                                                            <a
+                                                                href={getTourViewerLink(t.url, t._id)}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="nodecoration"
+                                                            >
+                                                                <Btn sm className="" text="open" />
+                                                            </a>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )
-                                        })
+                                                )
+                                            }
+                                            }
+
+                                        />
+
+                                // : toursToDisplay.map(t => {
                             }
                         </div>
 
                     </Col>
                 </Row>
-            </Container>
+            </Container >
 
     );
 };

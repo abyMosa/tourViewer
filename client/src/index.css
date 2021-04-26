@@ -90,18 +90,18 @@ body{
 .ab-snackbar h1{ display:none; }
 
 .tours-content{
-  margin-top:20px;
+  margin-top:20px; 
 }
 
 .tours-content >div{
-    margin-bottom:20px;
-      padding:20px 0px;
-      border-bottom:1px solid rgba(0,0,0,.3);
   }
 
 .tours-content__tour{
     display:flex;
     align-items:flex-start;
+    margin-bottom:20px;
+      padding:20px 0px;
+      border-bottom:1px solid rgba(0,0,0,.3);
   }
 
 .tours-content__tour > div{
@@ -140,6 +140,46 @@ body{
 .tours-content__tour > div:last-child{
         text-align:right;
       }
+
+.tours-content--digest .paginated-content__head, .tours-content--digest .ab-loader{
+      display:none;
+  }
+
+.tours-content--digest .paginated-content{
+    display:grid;
+    grid-column-gap:20px;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+
+  }
+
+.tours-content--digest .tours-content__details{
+    padding-left:0px!important;
+  }
+
+.tours-content--digest .tours-content__details h3{
+      font-size:14px;
+      margin-top:10px!important;
+    }
+
+.tours-content--digest .tours-content__tour{
+    margin-bottom:20px;
+      padding:20px 0px;
+      border-bottom:none;
+      flex-direction:column;
+      display:flex;
+  }
+
+.tours-content--digest .tours-content__tour > div{
+        flex:1;
+        width:100%;
+
+      }
+
+.tours-content--digest .tours-content__description, 
+  .tours-content--digest .tours-content__actions, 
+  .tours-content--digest .code-wrapper{
+    display:none!important;
+  }
 
 .user-circle{
   display:flex;
@@ -234,7 +274,20 @@ body{
     min-height:200px!important;
   }
 
+@media screen and (max-width: 900px){
+
+.tours-content--digest .paginated-content{
+      grid-template-columns:1fr 1fr 1fr
+
+  }
+    }
+
 @media screen and (max-width: 719px){
+
+.tours-content--digest .paginated-content{
+      grid-template-columns:1fr 1fr
+
+  }
   .ab-toolbar ul{
       display:flex!important;
   }
@@ -256,4 +309,12 @@ body{
     .tours-content__tour img{
       max-width:100%!important;
     }
-}
+    }
+
+@media screen and (max-width: 550px){
+
+.tours-content--digest .paginated-content{
+      grid-template-columns:1fr
+
+  }
+    }

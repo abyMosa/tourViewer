@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const userController = require("../controllers/userController");
 const tourController = require("../controllers/tourController");
+const Tour = require('../models/Tour');
 const { verifyToken } = require('../helpers/verifyToken');
 const { tourUploader, previewImageUploader } = require('./uploadMiddleware');
 
@@ -41,14 +42,23 @@ routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.upda
 // routes.patch('/tour/:id', previewImageUploader, tourController.updateTour);
 
 
-routes.get('/viewer', (req, res) => {
-    let { label, tour } = req.query;
+routes.get('/viewer', async (req, res) => {
+    let { id, tour } = req.query;
     let contentPath = req.query['content-path'];
     let imageUrl = [contentPath + "" + tour, 'preview.jpg'].join('/');
+    let label = null;
+    let description = undefined;
+
+    if (id) {
+        tourObj = await Tour.findById(id);
+        label = tourObj.name;
+        description = tourObj.description;
+    }
+
     let title = label || tour;
     let pageTitle = `${title} | RowiLAB Viewer`;
 
-    res.status(200).render('viewer', { label: pageTitle, imageUrl });
+    res.status(200).render('viewer', { label: pageTitle, imageUrl, description });
 });
 
 

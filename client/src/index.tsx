@@ -24,15 +24,15 @@ if (localStorage.jwtToken) {
 
 ReactDOM.render(
   <BrowserRouter>
-    <React.StrictMode>
-      <Provider store={store}>
-        <DocumentTitle>
-          <ScrollToTop>
-            <App />
-          </ScrollToTop>
-        </DocumentTitle>
-      </Provider>
-    </React.StrictMode>
+    {/* <React.StrictMode> */}
+    <Provider store={store}>
+      <DocumentTitle>
+        <ScrollToTop>
+          <App />
+        </ScrollToTop>
+      </DocumentTitle>
+    </Provider>
+    {/* </React.StrictMode> */}
   </BrowserRouter>,
   document.getElementById('root')
 );

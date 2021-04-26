@@ -6,6 +6,7 @@ const path = require("path");
 const rootDir = require('../helpers/path');
 const fs = require("fs");
 const { unzip, unzipSync } = require('../helpers/unzip');
+const { url } = require("inspector");
 // const JSZip = require('jszip');
 // const mkdir = require('mkdirp');
 // const unzip = require('unzip');
@@ -67,20 +68,6 @@ const deleteTour = async (req, res) => {
             }
         });
 
-
-        // let deleted = removeDir(tourPath);
-
-        // if (!deleted) {
-        //     return res.status(400).send({ error: true, message: 'unexpected error deleted false' })
-
-        // } else {
-        //     if (tour) {
-        //         const deleted = await tour.delete();
-        //         return res.status(200).send(deleted);
-        //     } else {
-        //         return res.status(500).send({ error: true, message: 'unexpected error' })
-        //     }
-        // }
 
 
     } catch (error) {
@@ -169,7 +156,14 @@ const addTour = async (req, res) => {
         fs.unlinkSync(req.body.filePath);
         console.log('zip file deleted');
 
+
         let folderName = path.basename(req.body.filePath, '.zip');
+        let filePath = path.resolve(unzipPath, folderName, 'tourData.json');
+
+        let url = new URL(req.headers.referer);
+
+        setTimeout(() => editTourData(filePath, urlPath, url.origin), 4000);
+
 
         const tour = new Tour({
             name: req.body.name !== '' ? req.body.name : folderName,
@@ -189,6 +183,52 @@ const addTour = async (req, res) => {
     });
 
 };
+
+const editTourData = (filePath, urlPath, origin) => {
+
+    let pathToTour = [origin, 'api', 'tours', urlPath].join('/');
+
+    fs.access(filePath, fs.F_OK, (err) => {
+        if (err) {
+            console.error('fs access err', err);
+            editTourData(filePath, urlPath, origin); // recursive
+            return;
+        }
+
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) console.log('fs read err', err);
+
+            let json = JSON.parse(data);
+            json.meshUrl = `${pathToTour}/mesh/mesh.mesh`;
+            json.materialsUrl = `${pathToTour}/mesh/mesh.mtr`;
+            json.meshTexturesPath = `${pathToTour}/mesh/`;
+            json.collisionTreeUrl = `${pathToTour}/mesh/collision.cmesh`;
+            json.highPolyCollisionTreeUrl = `${pathToTour}/mesh/highPolyCollision.cmesh`;
+            json.panoramasPath = `${pathToTour}/pano/`;
+            json.floors = json.floors.map(floor => {
+                let imageName = floor.autoTextureUrl.split('/').reverse()[0];
+                let userTextureImage = floor.userTextureUrl && floor.userTextureUrl.split('/').reverse()[0];
+                return {
+                    ...floor,
+                    autoTextureUrl: `${pathToTour}/auto_floorplans/${imageName}`,
+                    userTextureUrl: floor.userTextureUrl && `${pathToTour}/user_floorplans/${userTextureImage}`,
+                }
+            });
+
+            fs.writeFile(filePath, JSON.stringify(json, null, 2), (err, result) => {
+                if (err) console.log('fs write err', err);
+
+                console.log('tourData Updated');
+                return { error: false }
+            });
+
+        });
+
+    })
+}
+
+
+
 
 const getStoragePaths = (p, id) => {
 
@@ -215,9 +255,6 @@ const updateTour = async (req, res) => {
     let tour = await Tour.findById(req.params.id);
     if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
 
-    console.log('req.file', req.file);
-
-    // if there is a previewImage file then 
     if (req.file) {
 
         let tourPath = path.join(rootDir, 'public', tour.url);
