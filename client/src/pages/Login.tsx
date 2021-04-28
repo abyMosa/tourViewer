@@ -9,7 +9,7 @@ import { LocationState, UserLoginFormData } from "../types/types";
 
 
 const Login: FunctionComponent = () => {
-    let registrationAllowed = false;
+    let registrationAllowed = true;
     let location = useLocation();
     let locationState: LocationState = location.state as LocationState || { from: { pathname: "/user" } };
 

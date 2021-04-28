@@ -14,7 +14,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [showSnackbar, setShowSnackbar] = useState(false);
-    const registrationAllowed = false;
+    const registrationAllowed = true;
 
 
     let defaultForm: UserRegistrationFormData = { title: "", firstName: '', lastName: '', email: '', password: '' };
