@@ -246,11 +246,8 @@ const updateTour = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(400).send({ error: true, message: "Invalid tour id!" });
 
-    if (!req.body.name)
-        return res.status(400).send({ error: true, message: "Tour Name Required!" });
-
-    if (!req.body.description)
-        return res.status(400).send({ error: true, message: "Tour Description Required!" });
+    if (!req.body.name && !req.body.description && !req.file)
+        return res.status(400).send({ error: true, message: "Nothing to update!? one of the following is required: name, description or previewImage" });
 
     let tour = await Tour.findById(req.params.id);
     if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
@@ -278,9 +275,17 @@ const updateTour = async (req, res) => {
         });
     }
 
+    let toUpdate = {}
+    if (req.body.name && req.body.name !== '') {
+        toUpdate.name = req.body.name;
+    }
+    if (req.body.description && req.body.description !== '') {
+        toUpdate.description = req.body.description;
+    }
+
     const updatedTour = await Tour.findOneAndUpdate(
         { _id: tour._id },
-        { $set: { name: req.body.name, description: req.body.description } },
+        { $set: toUpdate },
     );
 
     if (!updatedTour) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
