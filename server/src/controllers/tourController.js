@@ -1,12 +1,13 @@
 const Tour = require("../models/Tour");
 const User = require("../models/User");
 const mongoose = require('mongoose');
-const decompress = require('decompress');
+// const decompress = require('decompress');
 const path = require("path");
 const rootDir = require('../helpers/path');
 const fs = require("fs");
-const { unzip, unzipSync } = require('../helpers/unzip');
-const { url } = require("inspector");
+const { unzip } = require('../helpers/unzip');
+// const { url } = require("inspector");
+var shell = require('shelljs');
 // const JSZip = require('jszip');
 // const mkdir = require('mkdirp');
 // const unzip = require('unzip');
@@ -156,14 +157,12 @@ const addTour = async (req, res) => {
         fs.unlinkSync(req.body.filePath);
         console.log('zip file deleted');
 
-
         let folderName = path.basename(req.body.filePath, '.zip');
         let filePath = path.resolve(unzipPath, folderName, 'tourData.json');
 
         let url = new URL(req.headers.referer);
 
         setTimeout(() => editTourData(filePath, urlPath, url.origin), 4000);
-
 
         const tour = new Tour({
             name: req.body.name !== '' ? req.body.name : folderName,
@@ -180,6 +179,12 @@ const addTour = async (req, res) => {
             let errs = Object.keys(error.errors).map(er => error.errors[er].message);
             res.status(400).send({ error: true, message: errs.join(', ') });
         }
+
+        shell.exec('pm2 restart 0', function (code, output) {
+            console.log('Exit code:', code);
+            console.log('Program output:', output);
+        });
+
     });
 
 };
