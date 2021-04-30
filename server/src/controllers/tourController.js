@@ -162,7 +162,6 @@ const addTour = async (req, res) => {
 
         let url = new URL(req.headers.referer);
 
-        setTimeout(() => editTourData(filePath, urlPath, url.origin), 4000);
 
         const tour = new Tour({
             name: req.body.name !== '' ? req.body.name : folderName,
@@ -180,10 +179,15 @@ const addTour = async (req, res) => {
             res.status(400).send({ error: true, message: errs.join(', ') });
         }
 
-        shell.exec('pm2 restart 0', function (code, output) {
-            console.log('Exit code:', code);
-            console.log('Program output:', output);
-        });
+        setTimeout(() => {
+            editTourData(filePath, urlPath, url.origin)
+            shell.exec('pm2 restart 0', function (code, output) {
+                console.log('Exit code:', code);
+                console.log('Program output:', output);
+            });
+
+        }, 4000);
+
 
     });
 
