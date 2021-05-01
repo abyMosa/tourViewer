@@ -126,71 +126,104 @@ const getUserTours = async (req, res) => {
 
 const addTour = async (req, res) => {
 
-    if (!req.body.user)
-        return res.status(400).send({ error: true, message: "user is required!" });
+    let userId = null;
+    let name = null;
+    let filePath = null;
 
-    if (!mongoose.Types.ObjectId.isValid(req.body.user))
-        return res.status(400).send({ error: true, message: "Invalid user id!" });
-
-
-    let user = await User.findById(req.body.user);
-    if (!user) {
-        return res.status(400).send({
-            error: true,
-            message: `Could not find a user with id ${req.body.user}`
-        });
-    }
-
-    if (!req.body.filePath) {
-        return res.status(400).send({
-            error: true,
-            message: `Could not find a req.body.filePath ${req.body.filePath}`
-        });
-    }
-
-    const { unzipPath, urlPath } = getStoragePaths(req.body.filePath, user._id);
-
-    unzip(req.body.filePath, unzipPath, async ({ error, err }) => {
-        if (error)
-            res.status(400).send({ error: true, message: 'error unzipping tour', err: err });
-
-        fs.unlinkSync(req.body.filePath);
-        console.log('zip file deleted');
-
-        let folderName = path.basename(req.body.filePath, '.zip');
-        let filePath = path.resolve(unzipPath, folderName, 'tourData.json');
-
-        let url = new URL(req.headers.referer);
-
-
-        const tour = new Tour({
-            name: req.body.name !== '' ? req.body.name : folderName,
-            description: req.body.description,
-            url: 'tours/' + urlPath,
-            user: req.body.user,
-        });
-
-        try {
-            const addedTour = await tour.save();
-            res.send(addedTour);
-
-        } catch (error) {
-            let errs = Object.keys(error.errors).map(er => error.errors[er].message);
-            res.status(400).send({ error: true, message: errs.join(', ') });
+    req.busboy.on('field', (fieldName, value) => {
+        if (fieldName === 'user') {
+            userId = value;
+            console.log(`User '${userId} `);
         }
 
-        setTimeout(() => {
-            editTourData(filePath, urlPath, url.origin)
-            shell.exec('pm2 restart 0', function (code, output) {
-                console.log('Exit code:', code);
-                console.log('Program output:', output);
-            });
-
-        }, 4000);
-
-
+        if (fieldName === 'name') {
+            name = value;
+            console.log(`name '${name} `);
+        }
     });
 
+    req.busboy.on('file', (fieldname, file, filename) => {
+        console.log(`Upload of '${filename}' started`);
+        console.log('fieldname', fieldname, process.env.uploadPath);
+
+        const pathToUpload = path.resolve(rootDir, process.env.uploadPath);
+        filePath = path.join(pathToUpload, filename);
+        console.log('filePath', filePath);
+
+
+        // Create a write stream of the new file
+        const fstream = fs.createWriteStream(path.join(pathToUpload, filename));
+        // Pipe it trough
+        file.pipe(fstream);
+
+        // On finish of the upload
+        fstream.on('close', async () => {
+            console.log(`Upload of '${filename}' finished`);
+            // res.redirect('back');
+
+            if (!userId)
+                return res.status(400).send({ error: true, message: "user is required!" });
+
+            if (!mongoose.Types.ObjectId.isValid(userId))
+                return res.status(400).send({ error: true, message: "Invalid user id!" });
+
+
+            let user = await User.findById(userId);
+            if (!user) {
+                return res.status(400).send({
+                    error: true,
+                    message: `Could not find a user with id ${userId}`
+                });
+            }
+
+            const { unzipPath, urlPath } = getStoragePaths(filePath, user._id);
+            unzip(filePath, unzipPath, async ({ error, err }) => {
+                if (error)
+                    res.status(400).send({ error: true, message: 'error unzipping tour', err: err });
+
+                fs.unlinkSync(filePath);
+                console.log('zip file deleted');
+
+                let folderName = path.basename(filePath, '.zip');
+                let tfilePath = path.resolve(unzipPath, folderName, 'tourData.json');
+
+                let url = new URL(req.headers.referer);
+
+
+                const tour = new Tour({
+                    name: req.body.name !== '' ? req.body.name : folderName,
+                    description: req.body.description,
+                    url: 'tours/' + urlPath,
+                    user: userId,
+                });
+
+                try {
+                    const addedTour = await tour.save();
+                    res.send(addedTour);
+
+                } catch (error) {
+                    let errs = Object.keys(error.errors).map(er => error.errors[er].message);
+                    res.status(400).send({ error: true, message: errs.join(', ') });
+                }
+
+                setTimeout(() => {
+                    if (url) {
+                        editTourData(tfilePath, urlPath, url.origin);
+                    }
+
+                    if (url.hostname !== "localhost") {
+                        shell.exec('pm2 restart 0', function (code, output) {
+                            console.log('Exit code:', code);
+                            console.log('Program output:', output);
+                        });
+                    }
+
+                }, 4000);
+
+            });
+
+        });
+    });
 };
 
 const editTourData = (filePath, urlPath, origin) => {
