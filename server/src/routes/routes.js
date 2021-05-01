@@ -33,7 +33,8 @@ routes.get('/tour/:id', tourController.getTour);
 // routes.post('/tour', verifyToken, tourUploader, tourController.addTour);
 // routes.post('/tour', busboyMeddleWare, tourController.addTour);
 // routes.post('/tour', multipartMiddleware, tourController.addTour);
-routes.post('/tour', busboy({ immediate: true }), tourController.addTour);
+// routes.post('/tour', busboy({ immediate: true }), tourController.addTour);
+routes.post('/tour', tourUploader, tourController.addTour);
 
 // routes.post('/tour/s3sign', tourController.s3sign);
 

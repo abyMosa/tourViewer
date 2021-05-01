@@ -57,7 +57,7 @@ const User = () => {
         }
     }, [dispatch, user]);
 
-    const filteredToures = userTours.filter(t => t.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1);
+    const filteredToures = userTours.filter(t => t.name?.toLowerCase().indexOf(filterText.toLowerCase()) !== -1);
     const filterButNoResult = filteredToures.length === 0 && filterText !== '';
     const toursToDisplay = (filteredToures.length !== 0 || filterButNoResult) ? filteredToures : userTours;
 
