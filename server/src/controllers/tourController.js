@@ -180,11 +180,19 @@ const addTour = async (req, res) => {
         }
 
         setTimeout(() => {
-            editTourData(filePath, urlPath, url.origin)
-            shell.exec('pm2 restart 0', function (code, output) {
-                console.log('Exit code:', code);
-                console.log('Program output:', output);
-            });
+
+            if (url) {
+                editTourData(filePath, urlPath, url.origin);
+            }
+
+            // editTourData(filePath, urlPath, url.origin)
+
+            if (url.hostname !== "localhost") {
+                shell.exec('pm2 restart 0', function (code, output) {
+                    console.log('Exit code:', code);
+                    console.log('Program output:', output);
+                });
+            }
 
         }, 4000);
 
