@@ -21,6 +21,12 @@ interface AddTourForm {
     tourFile: (File | null);
 }
 
+interface ChunkProgress {
+    idx: number;
+    loaded: number;
+    total: number;
+}
+
 type BlobSlice = (start?: number | undefined, end?: number | undefined, contentType?: string | undefined) => Blob
 
 const AddTour = () => {
@@ -37,7 +43,7 @@ const AddTour = () => {
     const [isFormValid, setIsFormValid] = useState(false);
     const [loading, setIsLoading] = useState(false);
 
-    const [progress, setProgress] = useState([0, 0]);
+    const [progress, setProgress] = useState<ChunkProgress[]>([]);
     const [events, setEvents] = useState<EventType[]>([]);
 
     const [currentAndTotalchunks, setCurrentAndTotalchunks] = useState([0, 0]);
@@ -135,7 +141,7 @@ const AddTour = () => {
             setEvents(event => [...event, EventType.UploadStarted, EventType.PreparingFiles]);
             setEvents(event => [...event, EventType.CreatingChunks]);
 
-            const chunkSize = 250 * 1024 * 1024; // The size of each chunk, set to 250 Megabyte
+            const chunkSize = 100 * 1024 * 1024; // The size of each chunk, set to 250 Megabyte
             const blobSlice = File.prototype.slice;  // Use the Blob.slice method to split the file.
 
             const file = addTourForm.tourFile;
@@ -172,7 +178,21 @@ const AddTour = () => {
                     onUploadProgress: (progressEvent: any) => {
                         // Progress in processing uploads
                         // console.log(blockCount, i, e, file);
-                        setProgress([progressEvent.loaded, progressEvent.total]);
+                        // return [...p, [progressEvent.loaded, progressEvent.total]]
+                        setProgress(progressList => {
+                            // return [...p, { idx: i, loaded: progressEvent.loaded, total: progressEvent.total }]
+
+                            let indexFound = progressList.findIndex(c => c.idx === i);
+                            if (indexFound !== -1) {
+                                return progressList.map(chunkprogress => {
+                                    return chunkprogress.idx === i
+                                        ? { ...chunkprogress, loaded: progressEvent.loaded }
+                                        : chunkprogress;
+                                });
+                            } else {
+                                return [...progressList, { idx: i, loaded: progressEvent.loaded, total: progressEvent.total }]
+                            }
+                        });
 
                         if (progressEvent.loaded >= progressEvent.total && i === blockCount - 1) {
                             setEvents(event => [...event, EventType.UpdatingRecords]);
@@ -292,17 +312,24 @@ const AddTour = () => {
             case EventType.UploadingTour:
                 return (
                     <div>
-                        {formatLog(event, `Uploading Tour chunk (total of ${currentAndTotalchunks[1]} chunks)  ${formatBytes(progress[0])} - ${formatBytes(progress[1])}`)}
-                        {/* {formatLog(null, `Large file, please be patient (${formatBytes(progress[0])} - ${formatBytes(progress[1])})`)} */}
                         {addTourForm.tourFile &&
-                            <div className="df">
-                                <div style={{ width: "38px" }}></div>
-                                <ProgressBar
-                                    show={progress[0] !== 0}
-                                    position={progress[0]}
-                                    total={progress[1]}
-                                />
-                            </div>
+
+                            progress.map((chunkProgress, i) => {
+                                return (
+                                    <div>
+                                        {formatLog(event, `Uploading Tour chunk (${i + 1} of ${currentAndTotalchunks[1]} chunks)  ${formatBytes(chunkProgress.loaded)} - ${formatBytes(chunkProgress.total)}`)}
+                                        <div className="df">
+                                            <div style={{ width: "38px" }}></div>
+                                            <ProgressBar
+                                                show={chunkProgress.loaded !== 0}
+                                                position={chunkProgress.loaded}
+                                                total={chunkProgress.total}
+                                            />
+                                        </div>
+                                    </div>
+                                )
+                            })
+
                         }
                     </div>
                 )
