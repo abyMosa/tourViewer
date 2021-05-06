@@ -3,7 +3,7 @@ const userController = require("../controllers/userController");
 const tourController = require("../controllers/tourController");
 const Tour = require('../models/Tour');
 const { verifyToken } = require('../helpers/verifyToken');
-const { tourUploader, previewImageUploader } = require('./uploadMiddleware');
+const { tourUploader, chunkUploader, previewImageUploader } = require('./uploadMiddleware');
 const { busboyMiddleware } = require('./busboyMiddleware');
 const busboy = require('connect-busboy');
 
@@ -30,13 +30,15 @@ routes.patch('/user/:id', verifyToken, userController.updateUser);
 // Tour
 routes.get('/tour/:id', tourController.getTour);
 
+// routes.post('/tour/s3sign', tourController.s3sign);
 // routes.post('/tour', verifyToken, tourUploader, tourController.addTour);
 // routes.post('/tour', busboyMeddleWare, tourController.addTour);
 // routes.post('/tour', multipartMiddleware, tourController.addTour);
 // routes.post('/tour', busboy({ immediate: true }), tourController.addTour);
 routes.post('/tour', tourUploader, tourController.addTour);
+routes.post('/tourchunk', chunkUploader, tourController.uploadTourChunks);
+routes.post('/mergetourchunks', chunkUploader, tourController.mergeTourChunks);
 
-// routes.post('/tour/s3sign', tourController.s3sign);
 
 
 
@@ -50,6 +52,8 @@ routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
 routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
 // routes.patch('/tour/:id', previewImageUploader, tourController.updateTour);
+
+
 
 
 routes.get('/viewer', async (req, res) => {

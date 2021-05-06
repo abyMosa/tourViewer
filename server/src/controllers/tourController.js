@@ -3,16 +3,17 @@ const User = require("../models/User");
 const mongoose = require('mongoose');
 // const decompress = require('decompress');
 const path = require("path");
-const rootDir = require('../helpers/path');
+const { rootDir, pathToUpload, mkdirsSync } = require('../helpers/path');
 const fs = require("fs");
 const { unzip } = require('../helpers/unzip');
 // const { url } = require("inspector");
 var shell = require('shelljs');
+const multer = require('multer');
+
 // const JSZip = require('jszip');
 // const mkdir = require('mkdirp');
 // const unzip = require('unzip');
 // const StreamZip = require('node-stream-zip');
-
 
 
 
@@ -307,9 +308,107 @@ const updateTour = async (req, res) => {
 };
 
 
+
+const uploadTourChunks = async (req, res) => {
+
+    console.log('file upload...');
+    // Create a folder based on the file hash and move the default uploaded files under the current hash folder.Convenient for subsequent file merge.
+    const { name, total, index, size, hash } = req.body;
+
+    console.log('hash & index', hash, index);
+    console.log('req.file.path', req.file.path);
+
+    const uploadPath = pathToUpload();
+    const chunksPath = path.join(uploadPath, hash, '/');
+    if (!fs.existsSync(chunksPath)) mkdirsSync(chunksPath);
+    fs.renameSync(req.file.path, chunksPath + hash + '-' + index);
+
+    return res.status(200).send('Success');
+}
+
+const mergeTourChunks = async (req, res) => {
+
+    const { size, name, total, hash, tourName, description, user } = req.body;
+    // Get the slice file based on the hash value.
+    // Create Storage File
+    // merge.
+    const uploadPath = pathToUpload();
+    const chunksPath = path.join(uploadPath, hash, '/');
+    const filePath = path.join(uploadPath, name);
+    // Read all chunks file names stored in the array
+    const chunks = fs.readdirSync(chunksPath);
+    // Create Storage File
+    fs.writeFileSync(filePath, '');
+    if (chunks.length !== total || chunks.length === 0) {
+        return res.status(400).send('Number of slice files does not match');
+    }
+
+    for (let i = 0; i < total; i++) {
+        // Append Write to File
+        fs.appendFileSync(filePath, fs.readFileSync(chunksPath + hash + '-' + i));
+        // Delete chunk used this time
+        fs.unlinkSync(chunksPath + hash + '-' + i);
+    }
+    fs.rmdirSync(chunksPath);
+
+    const { unzipPath, urlPath } = getStoragePaths(filePath, user);
+    return unzipTour(filePath, unzipPath, urlPath, tourName, description, user, req.headers.referer, res);
+
+    // File merge succeeded, file information can be stored in the library.
+    // return res.status(200).send('Merge succeeded');
+}
+
+const unzipTour = async (zipPath, unzipPath, urlPath, name, description, user, referer, res) => {
+    unzip(zipPath, unzipPath, async ({ error, err }) => {
+        if (error)
+            return res.status(400).send({ error: true, message: 'error unzipping tour', err: err });
+
+        fs.unlinkSync(zipPath);
+        console.log('zip file deleted');
+
+        let folderName = path.basename(zipPath, '.zip');
+        let filePath = path.resolve(unzipPath, folderName, 'tourData.json');
+
+        let url = new URL(referer);
+
+        const tour = new Tour({
+            name: name !== '' ? name : folderName,
+            description: description,
+            url: 'tours/' + urlPath,
+            user: user,
+        });
+
+        try {
+            const addedTour = await tour.save();
+            res.status(200).send(addedTour);
+
+        } catch (error) {
+            // let errs = Object.keys(error.errors).map(er => error.errors[er].message);
+            // res.status(400).send({ error: true, message: errs.join(', ') });
+            res.status(400).send({ error: true, message: 'Error Adding Tour', errs: error });
+        }
+
+        return setTimeout(() => {
+            if (url) {
+                editTourData(filePath, urlPath, url.origin)
+            }
+            if (url.hostname !== "localhost") {
+                shell.exec('pm2 restart 0', function (code, output) {
+                    console.log('Exit code:', code);
+                    console.log('Program output:', output);
+                });
+            }
+
+        }, 4000);
+
+    });
+}
+
 module.exports.getTour = getTour;
 module.exports.deleteTour = deleteTour;
 module.exports.getAllTours = getAllTours;
 module.exports.getUserTours = getUserTours;
 module.exports.addTour = addTour;
 module.exports.updateTour = updateTour;
+module.exports.uploadTourChunks = uploadTourChunks;
+module.exports.mergeTourChunks = mergeTourChunks;

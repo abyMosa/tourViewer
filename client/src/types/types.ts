@@ -57,6 +57,7 @@ export enum EventType {
     S3signSuccessful,
     UploadingImage,
     UploadingTour,
+    CreatingChunks,
     UpdatingRecords,
     UploadSucceeded,
     UploadFailed,
