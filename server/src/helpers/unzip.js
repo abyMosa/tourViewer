@@ -4,7 +4,7 @@ const StreamZip = require('node-stream-zip');
 const fs = require("fs");
 
 const unzip = async (filePath, unzipPath, cb) => {
-
+    console.log('decompressing zip file');
     let zip = new StreamZip({ file: filePath, storeEntries: true });
 
     zip.on('error', function (err) {

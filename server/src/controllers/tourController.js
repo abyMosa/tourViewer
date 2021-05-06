@@ -126,6 +126,7 @@ const getUserTours = async (req, res) => {
 
 const addTour = async (req, res) => {
     req.connection.setTimeout(3600000); //one hour
+    console.log('zip file uploaded and addTour is now called');
 
     if (!req.body.user)
         return res.status(400).send({ error: true, message: "user is required!" });
