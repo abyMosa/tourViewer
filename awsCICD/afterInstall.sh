@@ -12,3 +12,4 @@ pm2 kill
 pm2 delete all
 pm2 stop all
 pm2 start /var/www/rowilab/server/index.js --name "server"
+# pm2 start /var/www/rowilab/server/index.js --name "server" --node-args="--max-old-space-size=3072"

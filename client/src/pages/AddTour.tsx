@@ -8,6 +8,9 @@ import { api, axiosErr } from "../axios";
 import { EventType } from "../types/types";
 import ProgressBar from '../components/ProgressBar';
 import SparkMD5 from 'spark-md5';
+import pLimit from 'p-limit';
+
+const limit = pLimit(2);
 
 enum FormField {
     name,
@@ -200,7 +203,7 @@ const AddTour = () => {
                     },
                 };
                 // Add to Promise Array
-                axiosPromiseArray.push(api.post('/tourchunk', form, axiosOptions));
+                axiosPromiseArray.push(limit(() => api.post('/tourchunk', form, axiosOptions)));
             }
             // Request merge of slice files after all slice uploads
             await Promise
