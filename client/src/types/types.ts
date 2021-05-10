@@ -61,6 +61,7 @@ export enum EventType {
     UpdatingRecords,
     UploadSucceeded,
     UploadFailed,
+    Status504,
 }
 
 

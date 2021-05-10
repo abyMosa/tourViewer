@@ -81,6 +81,11 @@ const AddTour = () => {
 
     }
 
+    const updateScroll = () => {
+        var element = document.getElementById("uploadResult");
+        if (element) element.scrollTop = element.scrollHeight;
+    }
+
     const onSubmit = (e: any) => {
         e.preventDefault();
         uploadTour();
@@ -163,6 +168,7 @@ const AddTour = () => {
 
                 if (i === 0) {
                     setEvents(event => [...event, EventType.UploadingTour]);
+
                 }
                 setCurrentAndTotalchunks([i + 1, blockCount]);
 
@@ -205,6 +211,9 @@ const AddTour = () => {
                 // Add to Promise Array
                 axiosPromiseArray.push(limit(() => api.post('/tourchunk', form, axiosOptions)));
             }
+
+            // setIsLoading(true);
+
             // Request merge of slice files after all slice uploads
             await Promise
                 .all(axiosPromiseArray)
@@ -228,8 +237,14 @@ const AddTour = () => {
                         })
                         .catch(err => {
                             console.log(axiosErr(err));
+                            if (err.response && err.response.status === 504) {
+                                setEvents(event => [...event, EventType.Status504]);
+                                setShowSnackbar(true);
+                            } else {
+                                setEvents(event => [...event, EventType.UploadFailed]);
+                            }
+
                             setIsLoading(false);
-                            setEvents(event => [...event, EventType.UploadFailed]);
                         });
                 });
 
@@ -288,6 +303,7 @@ const AddTour = () => {
     }
 
     const formatLog = (event: (EventType | null), text: string): JSX.Element => {
+        setTimeout(() => updateScroll(), 1500);
         return (
             <div className="df f-jc-start f-aa-center">
                 <div style={{ width: "30px" }}>
@@ -303,6 +319,7 @@ const AddTour = () => {
     }
 
     const getEventContent = (event: EventType): JSX.Element => {
+        // updateScroll();
 
         switch (event) {
             case EventType.PreparingFiles:
@@ -346,6 +363,9 @@ const AddTour = () => {
             case EventType.UploadSucceeded:
                 return formatLog(event, 'Upload Succeeded')
 
+            case EventType.Status504:
+                return formatLog(event, 'Upload Succeeded, zip file is still being decompressed, please couple of minutes for the tour to appear on the tours page')
+
             case EventType.UploadFailed:
                 return formatLog(event, 'Upload Failed :(')
 
@@ -368,7 +388,7 @@ const AddTour = () => {
 
                 <Row className="" >
 
-                    <Col md7 className="pr-3">
+                    <Col md6 className="pr-3">
                         <HeadLine title="Add Tour" className="mb-4 mt-1" />
                         <Loader show={isAddingTour || loading} />
 
@@ -411,7 +431,7 @@ const AddTour = () => {
                         </form>
 
                     </Col>
-                    <Col md5 className="uploadResult">
+                    <Col md6 className="uploadResult" id="uploadResult">
                         <div className="mt-5">
                             {
                                 events.length === 0 ? null :

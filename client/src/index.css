@@ -18,6 +18,10 @@ body{
 
 .uploadResult{
   width:100%;
+      background-color:aliceblue;
+    max-height:80vh;
+    overflow-y:auto;
+    padding:0px 15px;
 }
 
 .mainLayout{
