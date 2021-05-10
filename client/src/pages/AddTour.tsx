@@ -286,7 +286,7 @@ const AddTour = () => {
 
     const isCurrentEvent = (event: EventType) => {
         let index = events.findIndex(e => e === event);
-        return index === events.length - 1 && event !== EventType.UploadSucceeded && event !== EventType.UploadFailed;
+        return index === events.length - 1 && event !== EventType.UploadSucceeded && event !== EventType.UploadFailed && event !== EventType.Status504;
 
     }
 
@@ -364,7 +364,7 @@ const AddTour = () => {
                 return formatLog(event, 'Upload Succeeded')
 
             case EventType.Status504:
-                return formatLog(event, 'Upload Succeeded, zip file is still being decompressed, please couple of minutes for the tour to appear on the tours page')
+                return formatLog(event, 'Upload Succeeded, zip file is still being decompressed, please allow couple of minutes for the tour to appear on the tours page')
 
             case EventType.UploadFailed:
                 return formatLog(event, 'Upload Failed :(')
