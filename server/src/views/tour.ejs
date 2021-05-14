@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= pageTitle %>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <meta name="description" content='<%=description %>'>
+    <meta propery="og:site_name" content="<%- siteName %>" />
+    <meta propery="image" content='<%- imageUrl %>' />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content='<%- pageUrl %>'>
+    <meta property="og:title" content='<%=pageTitle %>'>
+    <meta property="og:description" content='<%=description %>'>
+    <meta property="og:image" content='<%- imageUrl %>'>
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content='<%- pageUrl %>'>
+    <meta property="twitter:title" content='<%- pageTitle _%>'>
+    <meta property="twitter:description" content='<%=description %>'>
+    <meta property="twitter:image" content='<%- imageUrl %>'>
+
+    <style>
+        html,
+        body {
+            margin: 0px;
+            padding: 0pc;
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <iframe src="<%- viewerLink %>" frameborder="0"></iframe>
+
+</body>
+
+</html>

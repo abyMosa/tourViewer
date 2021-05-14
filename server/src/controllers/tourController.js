@@ -404,6 +404,38 @@ const unzipTour = async (zipPath, unzipPath, urlPath, name, description, user, r
     });
 }
 
+
+const renderTour = async (req, res) => {
+    let id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id))
+        return res.status(400).send({ error: true, message: "Invalid tour id!" });
+
+    let tour = await Tour.findById(id);
+    if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
+
+
+    let APP_URL = process.env.APP_URL;
+    let geoCvId = tour.url.split('/').reverse()[0];
+    let tourUrlAr = tour.url.split('/');
+    let imageUrl = [APP_URL, tourUrlAr.join('/'), 'preview.jpg'].join('/');
+    let pageUrl = [APP_URL, 'tours', id].join('/');
+
+    tourUrlAr.pop();
+    let tourUrlNoGeoId = tourUrlAr.join('/') + '/';
+    let contentPath = [APP_URL, tourUrlNoGeoId].join('/');
+    let viewerLink = `${APP_URL}/viewer?id=${id}&tour=${geoCvId}&content-path=${contentPath}`;
+
+
+    let description = tour.description;
+    let title = tour.name || geoCvId;
+    let pageTitle = `${title} | ${process.env.APP_NAME}`;
+    let siteName = process.env.APP_NAME;
+
+    res.status(200).render('tour', { siteName, pageTitle, imageUrl, description, viewerLink, pageUrl });
+}
+
+
 module.exports.getTour = getTour;
 module.exports.deleteTour = deleteTour;
 module.exports.getAllTours = getAllTours;
@@ -412,3 +444,4 @@ module.exports.addTour = addTour;
 module.exports.updateTour = updateTour;
 module.exports.uploadTourChunks = uploadTourChunks;
 module.exports.mergeTourChunks = mergeTourChunks;
+module.exports.renderTour = renderTour;

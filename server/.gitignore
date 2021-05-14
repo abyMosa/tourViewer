@@ -1,3 +1,4 @@
 node_modules
 public/tours/
 public-zips/
+.env

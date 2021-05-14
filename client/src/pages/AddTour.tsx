@@ -248,38 +248,6 @@ const AddTour = () => {
                         });
                 });
 
-
-
-            // var options = {
-            //     headers: { 'Content-Type': "multipart/form-data" },
-            //     onUploadProgress: (progressEvent: any) => {
-            //         setProgress([progressEvent.loaded, progressEvent.total]);
-
-            //         if (progressEvent.loaded >= progressEvent.total) {
-            //             setEvents(event => [...event, EventType.UpdatingRecords]);
-            //         }
-            //     }
-            // };
-
-            // var bodyFormData = new FormData();
-            // bodyFormData.append('tour', addTourForm.tourFile);
-            // bodyFormData.append('name', addTourForm.name);
-            // bodyFormData.append('description', addTourForm.description);
-            // bodyFormData.append('user', user._id);
-
-            // api.post('/tour', bodyFormData, options)
-            //     .then(result => {
-            //         console.log("upload complete", result);
-            //         setIsLoading(false);
-            //         setEvents(event => [...event, EventType.UploadSucceeded]);
-            //         setShowSnackbar(true);
-
-            //     })
-            //     .catch(err => {
-            //         console.log(axiosErr(err));
-            //         setIsLoading(false);
-            //         setEvents(event => [...event, EventType.UploadFailed]);
-            //     })
         }
 
     }

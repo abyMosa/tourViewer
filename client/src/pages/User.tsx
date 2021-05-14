@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal, Switch } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { fetchUserTours, getTourViewerLink, getTourImageUrl, deleteTour } from "../store/actions";
+import { fetchUserTours, getTourIframeViewerLink, getTourViewerLink, getTourImageUrl, deleteTour } from "../store/actions";
 import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
@@ -293,7 +293,7 @@ const User = () => {
                                                                             color='#555555'
                                                                             size='sm'
                                                                             onClick={() => {
-                                                                                navigator.clipboard.writeText(getTourViewerLink(t.url, t._id));
+                                                                                navigator.clipboard.writeText(getTourIframeViewerLink(t._id));
                                                                                 setShowSnackbar(true);
                                                                             }}
                                                                         />
@@ -313,13 +313,13 @@ const User = () => {
                                                                 className="code-wrapper"
                                                                 title="Copy to Clipboard"
                                                                 onClick={() => {
-                                                                    navigator.clipboard.writeText(getTourViewerLink(t.url, t._id));
+                                                                    navigator.clipboard.writeText(getTourIframeViewerLink(t._id));
                                                                     setShowSnackbar(true);
                                                                 }}
                                                             >
                                                                 <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
                                                                 <div className="ml-2">
-                                                                    <code> {getTourViewerLink(t.url, t._id)} </code>
+                                                                    <code> {getTourIframeViewerLink(t._id)} </code>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -328,7 +328,7 @@ const User = () => {
                                                             <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
                                                             <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
                                                             <a
-                                                                href={getTourViewerLink(t.url, t._id)}
+                                                                href={getTourIframeViewerLink(t._id)}
                                                                 target="_blank"
                                                                 rel="noreferrer"
                                                                 className="nodecoration"

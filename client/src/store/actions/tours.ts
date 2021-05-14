@@ -160,6 +160,10 @@ export const getTourViewerLink = (tourPath: string, id: string) => {
     return `${viewerPath}?id=${id}&tour=${tourName}&content-path=${urlHref}/`;
 }
 
+export const getTourIframeViewerLink = (id: string) => {
+    return [window.location.origin, 'api', 'tours', id].join('/');
+}
+
 export const getTourUrl = (tourPath: string) => {
     return `${window.location.origin}/api/${tourPath}`;
 }

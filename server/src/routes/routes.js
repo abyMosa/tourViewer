@@ -56,6 +56,8 @@ routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.upda
 
 
 
+routes.get('/tours/:id', tourController.renderTour);
+
 routes.get('/viewer', async (req, res) => {
     let { id, tour } = req.query;
     let contentPath = req.query['content-path'];
