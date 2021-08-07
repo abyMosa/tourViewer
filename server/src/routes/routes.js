@@ -3,7 +3,7 @@ const userController = require("../controllers/userController");
 const tourController = require("../controllers/tourController");
 const Tour = require('../models/Tour');
 const { verifyToken } = require('../helpers/verifyToken');
-const { tourUploader, chunkUploader, previewImageUploader } = require('./uploadMiddleware');
+const { tourUploader, chunkUploader, previewImageUploader, updateTourFilesUploader } = require('./uploadMiddleware');
 const { busboyMiddleware } = require('./busboyMiddleware');
 const busboy = require('connect-busboy');
 
@@ -50,8 +50,8 @@ routes.delete('/tour/:id', verifyToken, tourController.deleteTour);
 // routes.get('/user/:id/tours', tourController.getUserTours);
 routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
-routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
-// routes.patch('/tour/:id', previewImageUploader, tourController.updateTour);
+// routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
+routes.patch('/tour/:id', verifyToken, updateTourFilesUploader, tourController.updateFullTour);
 
 
 

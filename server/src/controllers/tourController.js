@@ -307,7 +307,78 @@ const updateTour = async (req, res) => {
     res.status(200).send(updatedTour);
 };
 
+const updateFullTour = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
+        return res.status(400).send({ error: true, message: "Invalid tour id!" });
 
+    if (!req.body.name && !req.body.description && !req.files)
+        return res.status(400).send({ error: true, message: "Nothing to update!? one of the following is required: name, description or previewImage" });
+
+    let tour = await Tour.findById(req.params.id);
+    if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
+
+    if (req.files) {
+        req.files.forEach(file => {
+            console.log(file.fieldname);
+            switch (file.fieldname) {
+                case "previewImage":
+                    replaceFile(tour, file, 'preview.jpg');
+                    console.log('replace previewImage');
+                    break;
+                case "userDataFile":
+                    replaceFile(tour, file, 'userData.json');
+                    console.log('replace UserData file');
+                    break;
+                case "tourDataFile":
+                    replaceFile(tour, file, 'tourData.json');
+                    console.log('replace tourData file');
+                    break;
+
+                default:
+                    break;
+            }
+        });
+
+    }
+
+    let toUpdate = {}
+    if (req.body.name && req.body.name !== '') {
+        toUpdate.name = req.body.name;
+    }
+    if (req.body.description && req.body.description !== '') {
+        toUpdate.description = req.body.description;
+    }
+
+    const updatedTour = await Tour.findOneAndUpdate(
+        { _id: tour._id },
+        { $set: toUpdate },
+    );
+
+    if (!updatedTour) return res.status(400).send({ error: true, message: "Unexpected Error!!" });
+
+    res.status(200).send(updatedTour);
+};
+
+const replaceFile = (tour, file, fileNameIncExt) => {
+    let tourPath = path.join(rootDir, 'public', tour.url);
+    let fileLocation = path.join(tourPath, fileNameIncExt);
+    let writeLocation = path.join(tourPath, `temp-${fileNameIncExt}`);
+
+    fs.writeFile(writeLocation, file.buffer, 'binary', (e) => {
+        if (e) {
+            console.error(e);
+            // return res.status(400).send({ error: true, err: e, message: 'error writing buffer' });
+        }
+
+        fs.unlinkSync(fileLocation);
+        fs.rename(writeLocation, fileLocation, err => {
+            if (err) {
+                console.error(err);
+                // return res.status(400).send({ error: true, err, message: 'error renaming' });
+            }
+        })
+    });
+}
 
 const uploadTourChunks = async (req, res) => {
 
@@ -442,6 +513,7 @@ module.exports.getAllTours = getAllTours;
 module.exports.getUserTours = getUserTours;
 module.exports.addTour = addTour;
 module.exports.updateTour = updateTour;
+module.exports.updateFullTour = updateFullTour;
 module.exports.uploadTourChunks = uploadTourChunks;
 module.exports.mergeTourChunks = mergeTourChunks;
 module.exports.renderTour = renderTour;

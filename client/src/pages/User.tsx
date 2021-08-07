@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal, Switch } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { fetchUserTours, getTourIframeViewerLink, getTourViewerLink, getTourImageUrl, deleteTour } from "../store/actions";
+import { fetchUserTours, getTourIframeViewerLink, getTourViewerLink, getTourImageUrl, deleteTour, getTourUrl } from "../store/actions";
 import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faLink, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLink, faPencilAlt, faFileDownload, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { Tour } from "../types/types";
 import PaginatedContent from '../components/PaginatedContent';
 import cn from 'classnames';
@@ -16,6 +16,8 @@ interface EditTourForm {
     name: string;
     description: string;
     previewImage: (File | null);
+    userDataFile: (File | null);
+    tourDataFile: (File | null);
 }
 
 
@@ -32,7 +34,7 @@ enum ViewType {
 
 const User = () => {
 
-    const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null }
+    const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null, userDataFile: null, tourDataFile: null }
     const [editTourForm, setEditTourForm] = useState(defaultTourEditData);
 
     const defaultEditState: EditingTour = { isModalOpen: false, loading: false, tour: null }
@@ -74,6 +76,8 @@ const User = () => {
             name: tour.name,
             description: tour.description || '',
             previewImage: null,
+            userDataFile: null,
+            tourDataFile: null,
         })
     }
 
@@ -114,9 +118,9 @@ const User = () => {
     }
 
 
-
     const submitEditForm = (tour: Tour) => {
-        if (editTourForm.name === "" && editTourForm.description === '' && !editTourForm.previewImage) {
+        let { name, description, previewImage, userDataFile, tourDataFile } = editTourForm;
+        if (name === "" && description === '' && !previewImage && !userDataFile && !tourDataFile) {
             closeEditModal();
             return;
         }
@@ -129,10 +133,16 @@ const User = () => {
         };
 
         var bodyFormData = new FormData();
-        bodyFormData.append('name', editTourForm.name);
-        bodyFormData.append('description', editTourForm.description);
-        if (editTourForm.previewImage) {
-            bodyFormData.append('previewImage', editTourForm.previewImage);
+        bodyFormData.append('name', name);
+        bodyFormData.append('description', description);
+        if (previewImage) {
+            bodyFormData.append('previewImage', previewImage);
+        }
+        if (userDataFile) {
+            bodyFormData.append('userDataFile', userDataFile);
+        }
+        if (tourDataFile) {
+            bodyFormData.append('tourDataFile', tourDataFile);
         }
 
         api.patch(`/tour/${tour._id}`, bodyFormData, options)
@@ -222,6 +232,24 @@ const User = () => {
                             accept=".jpg"
                         />
                     </div>
+                    <div className="mb-4">
+                        <h4>Replace userData.json file</h4>
+                        <input
+                            type="file"
+                            disabled={editingState.loading}
+                            onChange={(e: any) => setEditTourForm(f => ({ ...f, userDataFile: e.target.files[0] }))}
+                            accept=".json"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <h4>Replace tourData.json file</h4>
+                        <input
+                            type="file"
+                            disabled={editingState.loading}
+                            onChange={(e: any) => setEditTourForm(f => ({ ...f, tourDataFile: e.target.files[0] }))}
+                            accept=".json"
+                        />
+                    </div>
 
                     <div className="df f-jc-end">
                         <Btn text="cancel" dark className="mr-3 " onClick={() => closeEditModal()} />
@@ -278,7 +306,6 @@ const User = () => {
                                             pageLimit={12}
                                             data={toursToDisplay}
                                             renderRow={(t: any) => {
-
                                                 return (
                                                     <div className="tours-content__tour" key={t._id}>
                                                         <div className="tours-content__image"><img alt={t.name} src={getTourImageUrl(t.url)} /></div>
@@ -286,24 +313,43 @@ const User = () => {
                                                             <div className="df f-aa-center f-jc-sb ma-0">
                                                                 <h3 className="capitalise-fl ma-0 ">{t.name}</h3>
                                                                 {viewType === ViewType.DigestView &&
-                                                                    <div className="df f-jc-end">
+                                                                    <div className="df f-jc-end f-aa-center mt-2">
                                                                         <FontAwesomeIcon
-                                                                            className="pointer mr-2"
+                                                                            className="pointer mr-1"
                                                                             icon={faLink}
                                                                             color='#555555'
                                                                             size='sm'
+                                                                            title="Copy link to Clipboard"
                                                                             onClick={() => {
                                                                                 navigator.clipboard.writeText(getTourIframeViewerLink(t._id));
                                                                                 setShowSnackbar(true);
                                                                             }}
                                                                         />
                                                                         <FontAwesomeIcon
-                                                                            className="pointer"
+                                                                            className="pointer mr-1"
                                                                             icon={faPencilAlt}
                                                                             color='#555555'
                                                                             size='sm'
+                                                                            title="Edit tour"
                                                                             onClick={() => openEditModal(t)}
                                                                         />
+
+                                                                        <a
+                                                                            href={`${getTourUrl(t.url)}/tourData.json`}
+                                                                            download={`${t.name}-tourData.json`}
+                                                                            className="mr-2"
+                                                                            title="Download tourData.json"
+                                                                        >
+                                                                            <FontAwesomeIcon icon={faDownload} color='#555555' size='sm' />
+                                                                        </a>
+
+                                                                        <a
+                                                                            href={`${getTourUrl(t.url)}/userData.json`}
+                                                                            download={`${t.name}-userData.json`}
+                                                                            title="Download userData.json"
+                                                                        >
+                                                                            <FontAwesomeIcon icon={faFileDownload} color='#555555' size='sm' />
+                                                                        </a>
                                                                     </div>
                                                                 }
                                                             </div>
@@ -320,6 +366,36 @@ const User = () => {
                                                                 <FontAwesomeIcon icon={faCopy} color='#555555' size='sm' />
                                                                 <div className="ml-2">
                                                                     <code> {getTourIframeViewerLink(t._id)} </code>
+                                                                </div>
+                                                            </div>
+                                                            <div className="tours-content__downloads">
+                                                                <div>
+                                                                    <a
+                                                                        href={`${getTourUrl(t.url)}/tourData.json`}
+                                                                        download={`${t.name}-tourData.json`}
+                                                                        className="mr-2 df f-aa-center "
+                                                                        title="Download tourData.json"
+                                                                    >
+                                                                        <div className="svg-wrap">
+                                                                            <FontAwesomeIcon icon={faDownload} color='#555555' size='sm' />
+                                                                        </div>
+                                                                        <p className="ma-0 pl-2">Download tourData.json file </p>
+                                                                    </a>
+
+                                                                </div>
+                                                                <div>
+
+                                                                    <a
+                                                                        href={`${getTourUrl(t.url)}/userData.json`}
+                                                                        download={`${t.name}-userData.json`}
+                                                                        title="Download userData.json"
+                                                                        className="df f-aa-center"
+                                                                    >
+                                                                        <div className="svg-wrap">
+                                                                            <FontAwesomeIcon icon={faFileDownload} color='#555555' size='sm' />
+                                                                        </div>
+                                                                        <p className="ma-0 pl-2">Download userData.json file </p>
+                                                                    </a>
                                                                 </div>
                                                             </div>
                                                         </div>

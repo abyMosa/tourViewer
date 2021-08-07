@@ -56,6 +56,14 @@ const previewImageUploader = multer({
     }
 });
 
+const memoryStorage = multer.memoryStorage();
+const updateTourFilesUploader = multer({
+    storage: memoryStorage,
+    // fileFilter: (req, file, cb) => {
+    //     cb(null, ['.jpg', '.json'].includes(path.extname(file.originalname)));
+    // }
+});
+
 
 
 
@@ -86,5 +94,6 @@ const chunkUpload = multer({
 module.exports.tourUploader = upload.single('tour');
 module.exports.chunkUploader = chunkUpload.single('file');
 module.exports.previewImageUploader = previewImageUploader.single('previewImage');
+module.exports.updateTourFilesUploader = updateTourFilesUploader.any();
 
 module.exports.setUploadFolder = setUploadFolder;
