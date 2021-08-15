@@ -17,8 +17,6 @@ interface EditTourForm {
     name: string;
     description: string;
     previewImage: (File | null);
-    userDataFile: (File | null);
-    tourDataFile: (File | null);
 }
 
 
@@ -35,7 +33,7 @@ enum ViewType {
 
 const User = () => {
 
-    const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null, userDataFile: null, tourDataFile: null }
+    const defaultTourEditData: EditTourForm = { name: '', description: '', previewImage: null }
     const [editTourForm, setEditTourForm] = useState(defaultTourEditData);
 
     const defaultEditState: EditingTour = { isModalOpen: false, loading: false, tour: null }
@@ -43,6 +41,7 @@ const User = () => {
 
     const [viewType, setViewType] = useState<ViewType>(ViewType.ListView);
 
+    const [showtourDataSnackbar, setShowtourDataSnackbar] = useState([false, false]);
     const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
@@ -67,8 +66,6 @@ const User = () => {
     const filterButNoResult = filteredToures.length === 0 && filterText !== '';
     const toursToDisplay = (filteredToures.length !== 0 || filterButNoResult) ? filteredToures : userTours;
 
-
-
     const closeEditModal = () => {
         setEditingState(s => ({ ...s, isModalOpen: false }));
         setEditTourForm(defaultTourEditData)
@@ -79,9 +76,7 @@ const User = () => {
         setEditTourForm({
             name: tour.name,
             description: tour.description || '',
-            previewImage: null,
-            userDataFile: null,
-            tourDataFile: null,
+            previewImage: null
         })
     }
 
@@ -123,8 +118,8 @@ const User = () => {
 
 
     const submitEditForm = (tour: Tour) => {
-        let { name, description, previewImage, userDataFile, tourDataFile } = editTourForm;
-        if (name === "" && description === '' && !previewImage && !userDataFile && !tourDataFile) {
+        let { name, description, previewImage } = editTourForm;
+        if (name === "" && description === '' && !previewImage) {
             closeEditModal();
             return;
         }
@@ -141,12 +136,6 @@ const User = () => {
         bodyFormData.append('description', description);
         if (previewImage) {
             bodyFormData.append('previewImage', previewImage);
-        }
-        if (userDataFile) {
-            bodyFormData.append('userDataFile', userDataFile);
-        }
-        if (tourDataFile) {
-            bodyFormData.append('tourDataFile', tourDataFile);
         }
 
         api.patch(`/tour/${tour._id}`, bodyFormData, options)
@@ -175,6 +164,12 @@ const User = () => {
                     timeOut={3000}
                 />
                 <Snackbar
+                    show={showtourDataSnackbar[0]}
+                    message={showtourDataSnackbar[1] ? "tourData.json file updated" : "error updating tourDate.json!!"}
+                    onComplete={() => setShowtourDataSnackbar([false, true])}
+                    timeOut={3000}
+                />
+                <Snackbar
                     show={showDeletedSnackbar}
                     message="Tour Deleted"
                     onComplete={() => setShowDeletedSnackbar(false)}
@@ -186,7 +181,17 @@ const User = () => {
                     show={showEditTourModal.isOpen}
                     backDropClicked={() => setShowEditTourModal({ isOpen: false, tour: null })}
                 >
-                    <EditTourDataJson tour={showEditTourModal.tour} />
+                    <EditTourDataJson
+                        tour={showEditTourModal.tour}
+                        onSuccess={() => {
+                            setShowEditTourModal({ isOpen: false, tour: null });
+                            setShowtourDataSnackbar([true, true]);
+                        }}
+                        onError={() => {
+                            setShowEditTourModal({ isOpen: false, tour: null });
+                            setShowtourDataSnackbar([true, false]);
+                        }}
+                    />
                 </Modal>
 
 
@@ -243,24 +248,6 @@ const User = () => {
                             disabled={editingState.loading}
                             onChange={(e: any) => setEditTourForm(f => ({ ...f, previewImage: e.target.files[0] }))}
                             accept=".jpg"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <h4>Replace userData.json file</h4>
-                        <input
-                            type="file"
-                            disabled={editingState.loading}
-                            onChange={(e: any) => setEditTourForm(f => ({ ...f, userDataFile: e.target.files[0] }))}
-                            accept=".json"
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <h4>Replace tourData.json file</h4>
-                        <input
-                            type="file"
-                            disabled={editingState.loading}
-                            onChange={(e: any) => setEditTourForm(f => ({ ...f, tourDataFile: e.target.files[0] }))}
-                            accept=".json"
                         />
                     </div>
 

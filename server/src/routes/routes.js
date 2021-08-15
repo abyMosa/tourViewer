@@ -50,8 +50,9 @@ routes.delete('/tour/:id', verifyToken, tourController.deleteTour);
 // routes.get('/user/:id/tours', tourController.getUserTours);
 routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 
-// routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
-routes.patch('/tour/:id', verifyToken, updateTourFilesUploader, tourController.updateFullTour);
+routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
+// routes.patch('/tour/:id', verifyToken, updateTourFilesUploader, tourController.updateFullTour);
+routes.patch('/updateTourData', verifyToken, tourController.updateTourData);
 
 
 

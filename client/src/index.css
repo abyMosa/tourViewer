@@ -302,6 +302,14 @@ body{
   height:90%!important;
 }
 
+.react-codemirror2{
+  height:calc(100% - 40px);
+}
+
+.react-codemirror2 .CodeMirror{
+    height:100%;
+  }
+
 @media screen and (max-width: 900px){
 
 .tours-content--digest .paginated-content{
