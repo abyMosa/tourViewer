@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal, Switch } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { fetchUserTours, getTourIframeViewerLink, getTourViewerLink, getTourImageUrl, deleteTour, getTourUrl } from "../store/actions";
+import { fetchUserTours, getTourIframeViewerLink, getTourImageUrl, deleteTour, getTourUrl } from "../store/actions";
 import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
@@ -11,6 +11,7 @@ import { faCopy, faLink, faPencilAlt, faFileDownload, faDownload } from "@fortaw
 import { Tour } from "../types/types";
 import PaginatedContent from '../components/PaginatedContent';
 import cn from 'classnames';
+import EditTourDataJson from '../components/EditTourDataJson';
 
 interface EditTourForm {
     name: string;
@@ -44,6 +45,9 @@ const User = () => {
 
     const [showDeletedSnackbar, setShowDeletedSnackbar] = useState(false);
     const [showModal, setShowModal] = useState(false);
+
+    const [showEditTourModal, setShowEditTourModal] = useState({ isOpen: false, tour: null });
+
     const [isDeletingTour, setIsDeletingTour] = useState(false);
     const [tourToDelete, setTourToDelete] = useState<Tour | null>(null);
     const [showSnackbar, setShowSnackbar] = useState(false);
@@ -176,6 +180,15 @@ const User = () => {
                     onComplete={() => setShowDeletedSnackbar(false)}
                     timeOut={3000}
                 />
+
+                <Modal
+                    className="editTourData"
+                    show={showEditTourModal.isOpen}
+                    backDropClicked={() => setShowEditTourModal({ isOpen: false, tour: null })}
+                >
+                    <EditTourDataJson tour={showEditTourModal.tour} />
+                </Modal>
+
 
                 <Modal
                     show={showModal}
@@ -403,6 +416,7 @@ const User = () => {
 
                                                             <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
                                                             <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
+                                                            <Btn indigo sm className="" text="edit tourData" onClick={() => setShowEditTourModal({ isOpen: true, tour: t })} />
                                                             <a
                                                                 href={getTourIframeViewerLink(t._id)}
                                                                 target="_blank"
