@@ -31,11 +31,17 @@ const EditTourDataJson = (props: Props) => {
 
     const [json, setJson] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isInitialising, setIsInitialising] = useState(false);
 
     useEffect(() => {
+        setJson('');
         if (props.tour) {
+            setIsInitialising(true);
             api.get(`${getTourUrl(props.tour.url)}/tourData.json`)
-                .then(res => setJson(JSON.stringify(res.data, null, 8)))
+                .then(res => {
+                    setJson(JSON.stringify(res.data, null, 8));
+                    setIsInitialising(false);
+                })
                 .catch(err => console.log(err));
         }
 
@@ -62,7 +68,7 @@ const EditTourDataJson = (props: Props) => {
 
     return (
         <>
-            <Loader show={isLoading} />
+            <Loader show={isLoading || isInitialising} />
             <CodeMirror
                 value={json}
                 options={{
