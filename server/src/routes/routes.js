@@ -53,6 +53,7 @@ routes.get('/user/:id/tours', verifyToken, tourController.getUserTours);
 routes.patch('/tour/:id', verifyToken, previewImageUploader, tourController.updateTour);
 // routes.patch('/tour/:id', verifyToken, updateTourFilesUploader, tourController.updateFullTour);
 routes.patch('/updateTourData', verifyToken, tourController.updateTourData);
+routes.patch('/updateUserData', verifyToken, tourController.updateUserData);
 
 
 

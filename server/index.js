@@ -29,7 +29,7 @@ mongoose.connect(
     () => console.log('db connected')
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(routes);
 
 app.listen(port, () => console.log(`api is running on http://localhost:${port}`));

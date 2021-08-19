@@ -27,7 +27,7 @@ interface Props {
     onError: () => void;
 }
 
-const EditTourDataJson = (props: Props) => {
+const EditUserDataJson = (props: Props) => {
 
     const [json, setJson] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +37,7 @@ const EditTourDataJson = (props: Props) => {
         setJson('');
         if (props.tour) {
             setIsInitialising(true);
-            api.get(`${getTourUrl(props.tour.url)}/tourData.json`)
+            api.get(`${getTourUrl(props.tour.url)}/userData.json`)
                 .then(res => {
                     setJson(JSON.stringify(res.data, null, 8));
                     setIsInitialising(false);
@@ -55,7 +55,7 @@ const EditTourDataJson = (props: Props) => {
         setIsLoading(true);
         const jsonObj = JSON.parse(json);
 
-        api.patch('/updateTourData', { tour: props.tour, tourData: jsonObj })
+        api.patch('/updateUserData', { tour: props.tour, userData: jsonObj })
             .then(res => {
                 setIsLoading(false);
                 props.onSuccess();
@@ -87,4 +87,4 @@ const EditTourDataJson = (props: Props) => {
     );
 };
 
-export default EditTourDataJson;
+export default EditUserDataJson;

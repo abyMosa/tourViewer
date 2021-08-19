@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Snackbar, Btn, Container, Col, Row, Loader, HeadLine, TextInput, Modal, Switch } from '@abymosa/ipsg';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { fetchUserTours, getTourIframeViewerLink, getTourImageUrl, deleteTour, getTourUrl } from "../store/actions";
+import { fetchUserTours, getTourIframeViewerLink, getTourImageUrl, deleteTour } from "../store/actions";
 import { ApplicationState } from '../store/reducers';
 import { api } from "../axios";
 import { format_DD_MM_YYYY } from "../utils/date";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faLink, faPencilAlt, faFileDownload, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLink, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { Tour } from "../types/types";
 import PaginatedContent from '../components/PaginatedContent';
 import cn from 'classnames';
 import EditTourDataJson from '../components/EditTourDataJson';
+import EditUserDataJson from '../components/EditUserDataJson';
 
 interface EditTourForm {
     name: string;
@@ -46,6 +47,8 @@ const User = () => {
     const [showModal, setShowModal] = useState(false);
 
     const [showEditTourModal, setShowEditTourModal] = useState({ isOpen: false, tour: null });
+    const [showEditUserModal, setShowEditUserModal] = useState({ isOpen: false, tour: null });
+
 
     const [isDeletingTour, setIsDeletingTour] = useState(false);
     const [tourToDelete, setTourToDelete] = useState<Tour | null>(null);
@@ -165,7 +168,7 @@ const User = () => {
                 />
                 <Snackbar
                     show={showtourDataSnackbar[0]}
-                    message={showtourDataSnackbar[1] ? "tourData.json file updated" : "error updating tourDate.json!!"}
+                    message={showtourDataSnackbar[1] ? "file updated successfully" : "error updating file!!"}
                     onComplete={() => setShowtourDataSnackbar([false, true])}
                     timeOut={3000}
                 />
@@ -189,6 +192,24 @@ const User = () => {
                         }}
                         onError={() => {
                             setShowEditTourModal({ isOpen: false, tour: null });
+                            setShowtourDataSnackbar([true, false]);
+                        }}
+                    />
+                </Modal>
+
+                <Modal
+                    className="editUserData"
+                    show={showEditUserModal.isOpen}
+                    backDropClicked={() => setShowEditUserModal({ isOpen: false, tour: null })}
+                >
+                    <EditUserDataJson
+                        tour={showEditUserModal.tour}
+                        onSuccess={() => {
+                            setShowEditUserModal({ isOpen: false, tour: null });
+                            setShowtourDataSnackbar([true, true]);
+                        }}
+                        onError={() => {
+                            setShowEditUserModal({ isOpen: false, tour: null });
                             setShowtourDataSnackbar([true, false]);
                         }}
                     />
@@ -334,22 +355,7 @@ const User = () => {
                                                                             onClick={() => openEditModal(t)}
                                                                         />
 
-                                                                        <a
-                                                                            href={`${getTourUrl(t.url)}/tourData.json`}
-                                                                            download={`${t.name}-tourData.json`}
-                                                                            className="mr-2"
-                                                                            title="Download tourData.json"
-                                                                        >
-                                                                            <FontAwesomeIcon icon={faDownload} color='#555555' size='sm' />
-                                                                        </a>
 
-                                                                        <a
-                                                                            href={`${getTourUrl(t.url)}/userData.json`}
-                                                                            download={`${t.name}-userData.json`}
-                                                                            title="Download userData.json"
-                                                                        >
-                                                                            <FontAwesomeIcon icon={faFileDownload} color='#555555' size='sm' />
-                                                                        </a>
                                                                     </div>
                                                                 }
                                                             </div>
@@ -369,41 +375,15 @@ const User = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="tours-content__downloads">
-                                                                <div>
-                                                                    <a
-                                                                        href={`${getTourUrl(t.url)}/tourData.json`}
-                                                                        download={`${t.name}-tourData.json`}
-                                                                        className="mr-2 df f-aa-center "
-                                                                        title="Download tourData.json"
-                                                                    >
-                                                                        <div className="svg-wrap">
-                                                                            <FontAwesomeIcon icon={faDownload} color='#555555' size='sm' />
-                                                                        </div>
-                                                                        <p className="ma-0 pl-2">Download tourData.json file </p>
-                                                                    </a>
-
-                                                                </div>
-                                                                <div>
-
-                                                                    <a
-                                                                        href={`${getTourUrl(t.url)}/userData.json`}
-                                                                        download={`${t.name}-userData.json`}
-                                                                        title="Download userData.json"
-                                                                        className="df f-aa-center"
-                                                                    >
-                                                                        <div className="svg-wrap">
-                                                                            <FontAwesomeIcon icon={faFileDownload} color='#555555' size='sm' />
-                                                                        </div>
-                                                                        <p className="ma-0 pl-2">Download userData.json file </p>
-                                                                    </a>
-                                                                </div>
+                                                                <Btn indigo sm className="mr-3" text="edit tourData" onClick={() => setShowEditTourModal({ isOpen: true, tour: t })} />
+                                                                <Btn sm className="" text="edit userData" onClick={() => setShowEditUserModal({ isOpen: true, tour: t })} />
                                                             </div>
                                                         </div>
                                                         <div className="tours-content__actions">
 
                                                             <Btn sm dark className="" text="edit" onClick={() => openEditModal(t)} />
                                                             <Btn sm error className="" text="delete" onClick={() => showDeleteModal(t)} />
-                                                            <Btn indigo sm className="" text="edit tourData" onClick={() => setShowEditTourModal({ isOpen: true, tour: t })} />
+
                                                             <a
                                                                 href={getTourIframeViewerLink(t._id)}
                                                                 target="_blank"

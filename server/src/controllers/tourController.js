@@ -534,6 +534,31 @@ const updateTourData = async (req, res) => {
     });
 }
 
+const updateUserData = async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.body.tour._id))
+        return res.status(400).send({ error: true, message: "Invalid tour id!" });
+
+    if (!req.body.userData)
+        return res.status(400).send({ error: true, message: "User Data required" });
+
+    let tour = await Tour.findById(req.body.tour._id);
+    if (!tour) return res.status(400).send({ error: true, message: "Tour not found" });
+
+    let tourPath = path.join(rootDir, 'public', tour.url);
+    let fileLocation = path.join(tourPath, 'userData.json');
+    console.log('fileLocation', fileLocation);
+
+    fs.writeFile(fileLocation, JSON.stringify(req.body.userData, null, 2), (err, result) => {
+        if (err) {
+            console.log('fs write err', err);
+            return res.status(400).send({ error: true, message: "error writing userData.json", err });
+        }
+
+        console.log('userData Updated');
+        return res.status(200).send();
+    });
+}
+
 
 module.exports.getTour = getTour;
 module.exports.deleteTour = deleteTour;
@@ -546,3 +571,4 @@ module.exports.uploadTourChunks = uploadTourChunks;
 module.exports.mergeTourChunks = mergeTourChunks;
 module.exports.renderTour = renderTour;
 module.exports.updateTourData = updateTourData;
+module.exports.updateUserData = updateUserData;
